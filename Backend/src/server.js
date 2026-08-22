@@ -2,6 +2,7 @@ const express = require('express');
 const orderRoutes = require('./routes/orderRoutes');
 const restroRoutes = require('./routes/restroRoutes');
 const userRoutes = require('./routes/userRoutes');
+const db = require('./config/db');
 require("dotenv").config();
 
 const app=express();
@@ -25,7 +26,7 @@ app.use('/user', userRoutes);
 
 //***************Server***************
 app.listen(process.env.PORT,()=>{
-    console.log('Server started on port '+process.env.PORT)
+    console.log('Server started on port '+process.env.PORT + ' Time: ' + new Date().toLocaleString())
 })
 
 app.get('/',(req,res)=>{
@@ -35,3 +36,15 @@ app.get('/',(req,res)=>{
 app.get('/health',(req,res)=>{
     res.send('server is healthy')
 })
+
+
+//***************Database Connection***************
+db.one('SELECT NOW() AS current_time')
+  .then(data => {
+    console.log('Database connected');
+    console.log(data);
+  })
+  .catch(error => {
+    console.error('Database connection failed');
+    console.error(error);
+  });

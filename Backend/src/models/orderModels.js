@@ -1,60 +1,70 @@
 const db = require('../config/db');
 
-const createOrder = async (user_id, order_amount, order_status) => {
+const createOrder = async(orderData) => {
     try {
-        const result = await db.none.query(
-            'INSERT INTO orders (user_id, order_amount, order_status) VALUES ($1, $2, $3) RETURNING *',
-            [user_id, order_amount, order_status]
-        );
-        return result.rows[0];
-    } catch (error) {
+        // order_id and created_at are omitted because the database auto-generates them
+        const query = 'INSERT INTO orders (user_id, restaurant_id, total_amount, order_status) VALUES ($1, $2, $3, $4)';
+        await db.none(query, [orderData.user_id, orderData.restaurant_id, orderData.total_amount, orderData.order_status || 'PLACED']);
+        return {success:true, message:'Order created successfully'};
+    }
+    catch(error) {
+        console.log('Error creating order in model:', error);
         throw error;
     }
-};
+}
 
-const getAllOrders = async () => {
+const editOrder = async(orderParams, orderData) => {
     try {
-        const result = await db.manyOrNone.query('SELECT * FROM orders');
-        return result.rows;
-    } catch (error) {
+        const query=`UPDATE orders SET user_id=$1, restaurant_id=$2, total_amount=$3, order_status=$4 WHERE order_id=$5`;
+        await db.none(query, [orderData.user_id, orderData.restaurant_id, orderData.total_amount, orderData.order_status, orderParams.order_id]);
+        return {success:true, message:'Order updated successfully'};
+    }
+    catch(error) {
+        console.log('Error updating order in model:', error);
         throw error;
     }
-};
+}
 
-const getOrderById = async (order_id) => {
+const getOrder = async(orderParams) => {
     try {
-        const result = await db.manyOrNone.query('SELECT * FROM orders WHERE order_id = $1', [order_id]);
-        return result.rows[0];
-    } catch (error) {
+        const query = `SELECT * from orders WHERE order_id=$1`;
+        const order = await db.one(query, [orderParams.order_id]);
+        return {success:true, order:order};
+    }
+    catch(error) {
+        console.log('Error finding order in model:', error);
         throw error;
     }
-};
+}
 
-const updateOrder = async (order_id, order_amount, order_status) => {
+const getAllOrders = async()=> {
     try {
-        const result = await db.query(
-            'UPDATE orders SET order_amount = $1, order_status = $2 WHERE order_id = $3 RETURNING *',
-            [order_amount, order_status, order_id]
-        );
-        return result.rows[0];
-    } catch (error) {
+        const query = `SELECT * from orders ORDER BY created_at DESC`;
+        const orders = await db.many(query);
+        return {success:true, orders:orders};
+    }
+    catch(error) {
+        console.log('Error returning all orders in model:', error);
         throw error;
     }
-};
+}
 
-const deleteOrder = async (order_id) => {
+const deleteOrder = async(orderParams)=> {
     try {
-        const result = await db.query('DELETE FROM orders WHERE order_id = $1 RETURNING *', [order_id]);
-        return result.rows[0];
-    } catch (error) {
+        const query = `DELETE from orders WHERE order_id=$1`;
+        await db.none(query, [orderParams.order_id]);
+        return {success:true, message:'Order deleted successfully'};
+    }
+    catch(error) {
+        console.log('Error deleting order in model:', error);
         throw error;
     }
-};
+}
 
 module.exports = {
     createOrder,
+    editOrder,
+    getOrder,
     getAllOrders,
-    getOrderById,
-    updateOrder,
     deleteOrder
-};
+}

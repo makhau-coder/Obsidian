@@ -1,16 +1,17 @@
 const express = require('express');
-const orderRouter = express.Router();
-const orderController = require('../controllers/orderController');
+const userRouter = express.Router();
+const userController = require('../controllers/userController');
 
+userRouter.use(express.json());
 
-orderRouter.get('/',(req,res)=>{
-    res.send('Order service is running')
+userRouter.get('/',(req,res)=>{
+    res.send('User service is running')
 })
 
-orderRouter.post('/createOrder', orderController.createOrderController)
-orderRouter.put('/editOrder/:order_id', orderController.editOrderController)
-orderRouter.get('/getOrder/:order_id', orderController.getOrderController)
-orderRouter.get('/getAllOrders', orderController.getAllOrdersController)
-orderRouter.delete('/deleteOrder/:order_id', orderController.deleteOrderController)
+userRouter.post('/createUser', userController.createUserController)
+userRouter.put('/editUser/:user_id', userController.editUserController)
+userRouter.get('/getUser/:user_id', userController.getUserController)
+userRouter.get('/getAllUsers', userController.getAllUsersController)
+userRouter.delete('/deleteUser/:user_id', userController.deleteUserController)
 
-module.exports = orderRouter;
+module.exports = userRouter;

@@ -1,69 +1,69 @@
 const db = require('../config/db');
 
-const createUser = async(userData) => {
+const createOrder = async (orderData) => {
     try {
-        query = 'INSERT INTO users (user_id, user_name, user_gender, user_email, user_phone, user_password, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)';
-        await db.none(query, [userData.user_id, userData.user_name, userData.user_gender, userData.user_email, userData.user_phone, userData.user_password, new Date()]);
-        return {success:true, message:'User created successfully'};
+        const query = 'INSERT INTO orders (order_id, user_id, order_amount, order_status, created_at) VALUES ($1, $2, $3, $4, $5)';
+        await db.none(query, [orderData.order_id, orderData.user_id, orderData.order_amount, orderData.order_status, new Date()]);
+        return { success: true, message: 'Order created successfully' };
     }
-    catch(error) {
-        console.log('Error creating user in model:', error);
+    catch (error) {
+        console.log('Error creating order in model:', error);
         throw error;
     }
 }
 
-const editUser = async(userParams, userData) => {
+const editOrder = async (orderParams, orderData) => {
     try {
-        const query=`UPDATE users SET user_name=$1, user_gender=$2, user_email=$3, user_phone=$4, user_password=$5 WHERE user_id=$6`;
-        await db.none(query, [userData.user_name, userData.user_gender, userData.user_email, userData.user_phone, userData.user_password, userParams.user_id]);
-        return {success:true, message:'User updated successfully'};
+        const query = `UPDATE orders SET user_id=$1, order_amount=$2, order_status=$3 WHERE order_id=$4`;
+        await db.none(query, [orderData.user_id, orderData.order_amount, orderData.order_status, orderParams.order_id]);
+        return { success: true, message: 'Order updated successfully' };
     }
-    catch(error) {
-        console.log('Error updating user in model:', error);
+    catch (error) {
+        console.log('Error updating order in model:', error);
         throw error;
     }
 }
 
-const getUser = async(userParams) => {
+const getOrder = async (orderParams) => {
     try {
-        const query = `SELECT * from users WHERE user_id=$1`;
-        const user = await db.one(query, [userParams.user_id]);
-        return {success:true, user:user};
+        const query = `SELECT * from orders WHERE order_id=$1`;
+        const order = await db.one(query, [orderParams.order_id]);
+        return { success: true, order: order };
     }
-    catch(error) {
-        console.log('Error finding user in model:', error);
+    catch (error) {
+        console.log('Error finding order in model:', error);
         throw error;
     }
 }
 
-const getAllUsers = async()=> {
+const getAllOrders = async () => {
     try {
-        const query = `SELECT * from users ORDER BY created_at DESC`;
-        const users = await db.many(query);
-        return {success:true, users:users};
+        const query = `SELECT * from orders ORDER BY created_at DESC`;
+        const orders = await db.many(query);
+        return { success: true, orders: orders };
     }
-    catch(error) {
-        console.log('Error returning all users in model:', error);
+    catch (error) {
+        console.log('Error returning all orders in model:', error);
         throw error;
     }
 }
 
-const deleteUser = async(userParams)=> {
+const deleteOrder = async (orderParams) => {
     try {
-        const query = `DELETE from users WHERE user_id=$1`;
-        const users = await db.none(query, [userParams.user_id]);
-        return {success:true, message:'User deleted successfully'};
+        const query = `DELETE from orders WHERE order_id=$1`;
+        await db.none(query, [orderParams.order_id]);
+        return { success: true, message: 'Order deleted successfully' };
     }
-    catch(error) {
-        console.log('Error deleting users in model:', error);
+    catch (error) {
+        console.log('Error deleting order in model:', error);
         throw error;
     }
 }
 
 module.exports = {
-    createUser,
-    editUser,
-    getUser,
-    getAllUsers,
-    deleteUser
+    createOrder,
+    editOrder,
+    getOrder,
+    getAllOrders,
+    deleteOrder
 }

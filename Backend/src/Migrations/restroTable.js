@@ -5,7 +5,7 @@ async function createTable() {
     try {
         const query = `
         CREATE TABLE IF NOT EXISTS restros (
-            restro_id VARCHAR(100) PRIMARY KEY,
+            restro_id VARCHAR(255) PRIMARY KEY,
             restro_owner_id VARCHAR(100) NOT NULL,
             restro_name VARCHAR(100) NOT NULL,
             restro_location TEXT NOT NULL,

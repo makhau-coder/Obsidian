@@ -1,18 +1,50 @@
 const restroModel = require('../models/restroModels');
+const userService = require('../services/userService');
+const miscellaneousFunctions = require('../services/functions')
+const regex = require('../models/regularExpressions');
+
 
 // ==========================================
 // RESTAURANT SERVICES
 // ==========================================
 
-const createRestroService = async (restroData) => {
+const createRestroService = async (data) => {
     try {
-        // Basic sanitization
-        if (restroData.restro_email) {
-            restroData.restro_email = restroData.restro_email.trim().toLowerCase();
+
+        const restro_id = miscellaneousFunctions.generateUniqueId("RESTRO");
+
+        if (data.restro_email) {
+            data.restro_email = data.restro_email.trim().toLowerCase();
         }
 
-        await restroModel.createRestro(restroData);
-        return { success: true, message: 'Restro created successfully via service' };
+        data.restro_name = miscellaneousFunctions.capitalizeFirstLetter(data.restro_name);
+
+        if (!regex.pincodeRegex.test(data.restro_pincode)) {
+            return { success: false, message: 'Invalid pincode' };
+        }
+        
+        const userData = {
+            user_firstname: data.user_firstname,
+            user_lastname: data.user_lastname,
+            user_gender: data.user_gender,
+            user_role: data.user_role,
+            user_email: data.restro_email,
+            user_phone: data.restro_phone,
+            user_password: data.restro_password
+        }
+
+        const user_message = await userService.createUserService(userData);
+
+        const restroData = {
+            restro_id: restro_id,
+            restro_name: data.restro_name,
+            restro_owner_id: user_message.user_id,
+            restro_location: data.restro_location,
+            restro_pincode: data.restro_pincode
+        }
+
+        const restro_message = await restroModel.createRestro(restroData);
+        return { success: true, message: restro_message.message + "\n" + user_message.message };
     } catch (error) {
         console.log('Error creating restro in service:', error);
         throw error;

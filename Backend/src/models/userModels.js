@@ -1,11 +1,10 @@
 const db = require('../config/db');
 
-const createUser = async (userData) => {
+const createUser = async (user_id,userData) => {
     try {
-        // FIXED: Added missing 'const' declaration
-        const query = 'INSERT INTO users (user_id, user_name, user_gender, user_email, user_phone, user_password, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)';
-        await db.none(query, [userData.user_id, userData.user_name, userData.user_gender, userData.user_email, userData.user_phone, userData.user_password, new Date()]);
-        return { success: true, message: 'User created successfully' };
+        const query = 'INSERT INTO users (user_id, user_firstname, user_lastname, user_gender, user_role, user_email, user_phone, user_password, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
+        await db.none(query, [user_id, userData.user_firstname, userData.user_lastname, userData.user_gender, userData.user_role, userData.user_email, userData.user_phone, userData.user_password, new Date()]);
+        return { success: true, message: `User ${user_id} created successfully` , user_id:user_id};
     }
     catch (error) {
         console.log('Error creating user in model:', error);
@@ -15,8 +14,8 @@ const createUser = async (userData) => {
 
 const editUser = async (userParams, userData) => {
     try {
-        const query = `UPDATE users SET user_name=$1, user_gender=$2, user_email=$3, user_phone=$4, user_password=$5 WHERE user_id=$6`;
-        await db.none(query, [userData.user_name, userData.user_gender, userData.user_email, userData.user_phone, userData.user_password, userParams.user_id]);
+        const query = `UPDATE users SET user_firstname=$1, user_lastname=$2, user_gender=$3, user_email=$4, user_phone=$5, user_role=$6, user_password=$7 WHERE user_id=$8`;
+        await db.none(query, [userData.user_firstname,userData.user_lastname, userData.user_gender, userData.user_email, userData.user_phone, userData.user_role, userData.user_password, userParams.user_id]);
         return { success: true, message: 'User updated successfully' };
     }
     catch (error) {
@@ -53,7 +52,7 @@ const deleteUser = async (userParams) => {
     try {
         const query = `DELETE from users WHERE user_id=$1`;
         await db.none(query, [userParams.user_id]);
-        return { success: true, message: 'User deleted successfully' };
+        return { success: true, message: `User ${user_id} deleted successfully` };
     }
     catch (error) {
         console.log('Error deleting users in model:', error);

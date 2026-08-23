@@ -6,10 +6,9 @@ const db = require('../config/db');
 
 const createRestro = async (restroData) => {
     try {
-        // FIXED: Added const
-        const query = 'INSERT INTO restros (restro_id, restro_name, restro_location, restro_email, restro_phone, created_at) VALUES ($1, $2, $3, $4, $5, $6)';
-        await db.none(query, [restroData.restro_id, restroData.restro_name, restroData.restro_location, restroData.restro_email, restroData.restro_phone, new Date()]);
-        return { success: true, message: 'Restro created successfully' };
+        const query = 'INSERT INTO restros (restro_id, restro_name, restro_owner_id, restro_location, restro_pincode, created_at) VALUES ($1, $2, $3, $4, $5, $6)';
+        await db.none(query, [restroData.restro_id, restroData.restro_name, restroData.restro_owner_id, restroData.restro_location, restroData.restro_pincode, new Date()])
+        return { success: true, message: `Restro ${restroData.restro_id} created successfully` , restro_id: restroData.restro_id};
     }
     catch (error) {
         console.log('Error creating restro in model:', error);

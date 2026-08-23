@@ -4,12 +4,11 @@ const createUserController = async (req, res) => {
     try {
         const result = await userService.createUserService(req.body);
         
-        // Check if the service returned a validation error
         if (!result.success) {
             return res.status(400).json(result); 
         }
 
-        res.status(201).json({ success: true, message: `User ${req.body.user_id} created successfully` });
+        res.status(201).json({ success: true, message: result.message });
     }
     catch (error) {
         console.error('Error creating user in controller:', error);
@@ -72,7 +71,7 @@ const deleteUserController = async (req, res) => {
             return res.status(400).json(result);
         }
 
-        res.status(200).json({ success: true, message: `User ${req.params.user_id} deleted successfully` });
+        res.status(200).json({ success: true, message: message.message });
     }
     catch (error) {
         console.error('Error deleting user in controller:', error);

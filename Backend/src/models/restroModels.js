@@ -6,8 +6,8 @@ const db = require('../config/db');
 
 const createRestro = async(restroData) => {
     try {
-        const query = 'INSERT INTO restros (restro_id, restro_name, restro_location, restro_phone) VALUES ($1, $2, $3, $4)';
-        await db.none(query, [restroData.restro_id, restroData.restro_name, restroData.restro_location, restroData.restro_phone]);
+        const query = 'INSERT INTO restros (restro_id, restro_name, restro_location, restro_email, restro_phone, created_at) VALUES ($1, $2, $3, $4, $5, $6)';
+        await db.none(query, [restroData.restro_id, restroData.restro_name, restroData.restro_location, restroData.restro_email, restroData.restro_phone, new Date()]);
         return {success:true, message:'Restro created successfully'};
     }
     catch(error) {
@@ -70,8 +70,8 @@ const deleteRestro = async(restroParams)=> {
 
 const createMenuItem = async(menuData) => {
     try {
-        const query = 'INSERT INTO menu_items (restro_id, item_name, item_description, item_price, is_available) VALUES ($1, $2, $3, $4, $5)';
-        await db.none(query, [menuData.restro_id, menuData.item_name, menuData.item_description, menuData.item_price, menuData.is_available ?? true]);
+        const query = 'INSERT INTO menu_items (item_id, restro_id, item_name, item_description, item_price, is_available) VALUES ($1, $2, $3, $4, $5, $6)';
+        await db.none(query, [menuData.item_id, menuData.restro_id, menuData.item_name, menuData.item_description, menuData.item_price, menuData.is_available ?? true]);
         return {success:true, message:'Menu item created successfully'};
     }
     catch(error) {

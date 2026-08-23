@@ -3,8 +3,8 @@ const db = require('../config/db');
 const createOrder = async(orderData) => {
     try {
         // order_id and created_at are omitted because the database auto-generates them
-        const query = 'INSERT INTO orders (user_id, restro_id, total_amount, order_status) VALUES ($1, $2, $3, $4)';
-        await db.none(query, [orderData.user_id, orderData.restro_id, orderData.total_amount, orderData.order_status || 'PLACED']);
+        const query = 'INSERT INTO orders (order_id, user_id, restro_id, total_amount, order_status, created_at) VALUES ($1, $2, $3, $4, $5, $6)';
+        await db.none(query, [orderData.order_id, orderData.user_id, orderData.restro_id, orderData.total_amount, orderData.order_status || 'PLACED', new Date()]);
         return {success:true, message:'Order created successfully'};
     }
     catch(error) {

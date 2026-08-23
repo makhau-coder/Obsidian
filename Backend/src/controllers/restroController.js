@@ -1,61 +1,70 @@
-const restroModel = require('../models/restroModels')
+const restroService = require('../services/restroService');
 
 // ==========================================
 // RESTAURANT CONTROLLERS
 // ==========================================
 
-const createRestroController = async(req,res) =>{
-    try{
-        await restroModel.createRestro(req.body);
-        res.status(201).json({success:true, message: `Restro created successfully`});
+const createRestroController = async (req, res) => {
+    try {
+        const result = await restroService.createRestroService(req.body);
+        if (!result.success) return res.status(400).json(result);
+        
+        res.status(201).json({ success: true, message: `Restro created successfully` });
     }
-    catch(error){
+    catch (error) {
         console.error('Error creating restro in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const editRestroController = async(req,res) =>{
-    try{
-        await restroModel.editRestro(req.params,req.body);
-        res.status(201).json({success:true, message: `Restro ${req.params.restro_id} edited successfully`});
+const editRestroController = async (req, res) => {
+    try {
+        const result = await restroService.editRestroService(req.params, req.body);
+        if (!result.success) return res.status(400).json(result);
+
+        res.status(200).json({ success: true, message: `Restro ${req.params.restro_id} edited successfully` });
     }
-    catch(error){
+    catch (error) {
         console.error('Error editing restro in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const getRestroController = async(req,res) => {
-    try{
-        const restro= await restroModel.getRestro(req.params);
-        res.status(201).json({success:true, restro: restro.restro});
+const getRestroController = async (req, res) => {
+    try {
+        const result = await restroService.getRestroService(req.params);
+        if (!result.success) return res.status(400).json(result);
+        if (!result.restro) return res.status(404).json({ success: false, message: 'Restaurant not found' });
+
+        res.status(200).json({ success: true, restro: result.restro });
     }
-    catch(error) {
+    catch (error) {
         console.error(`Error retrieving restro ${req.params.restro_id} in controller:`, error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const getAllRestrosController = async(req,res) => {
-    try{
-        const restros= await restroModel.getAllRestros();
-        res.status(201).json({success:true, restros: restros.restros});
+const getAllRestrosController = async (req, res) => {
+    try {
+        const result = await restroService.getAllRestrosService();
+        res.status(200).json({ success: true, restros: result.restros });
     }
-    catch(error) {
+    catch (error) {
         console.error('Error retrieving restros in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const deleteRestroController = async(req,res) => {
-    try{
-        await restroModel.deleteRestro(req.params);
-        res.status(201).json({success:true, message: `Restro ${req.params.restro_id} deleted successfully`});
+const deleteRestroController = async (req, res) => {
+    try {
+        const result = await restroService.deleteRestroService(req.params);
+        if (!result.success) return res.status(400).json(result);
+
+        res.status(200).json({ success: true, message: `Restro ${req.params.restro_id} deleted successfully` });
     }
-    catch(error) {
+    catch (error) {
         console.error('Error deleting restro in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
@@ -63,59 +72,69 @@ const deleteRestroController = async(req,res) => {
 // MENU ITEM CONTROLLERS
 // ==========================================
 
-const createMenuItemController = async(req,res) =>{
-    try{
-        await restroModel.createMenuItem(req.body);
-        res.status(201).json({success:true, message: `Menu item created successfully`});
+const createMenuItemController = async (req, res) => {
+    try {
+        const result = await restroService.createMenuItemService(req.body);
+        if (!result.success) return res.status(400).json(result);
+
+        res.status(201).json({ success: true, message: `Menu item created successfully` });
     }
-    catch(error){
+    catch (error) {
         console.error('Error creating menu item in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const editMenuItemController = async(req,res) =>{
-    try{
-        await restroModel.editMenuItem(req.params,req.body);
-        res.status(201).json({success:true, message: `Menu item ${req.params.item_id} edited successfully`});
+const editMenuItemController = async (req, res) => {
+    try {
+        const result = await restroService.editMenuItemService(req.params, req.body);
+        if (!result.success) return res.status(400).json(result);
+
+        res.status(200).json({ success: true, message: `Menu item ${req.params.item_id} edited successfully` });
     }
-    catch(error){
+    catch (error) {
         console.error('Error editing menu item in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const getMenuItemController = async(req,res) => {
-    try{
-        const menuItem = await restroModel.getMenuItem(req.params);
-        res.status(201).json({success:true, menuItem: menuItem.menuItem});
+const getMenuItemController = async (req, res) => {
+    try {
+        const result = await restroService.getMenuItemService(req.params);
+        if (!result.success) return res.status(400).json(result);
+        if (!result.menuItem) return res.status(404).json({ success: false, message: 'Menu item not found' });
+
+        res.status(200).json({ success: true, menuItem: result.menuItem });
     }
-    catch(error) {
+    catch (error) {
         console.error(`Error retrieving menu item ${req.params.item_id} in controller:`, error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const getAllMenuItemsController = async(req,res) => {
-    try{
-        // Expects restro_id to fetch the menu for a specific restaurant
-        const menuItems = await restroModel.getAllMenuItems(req.params);
-        res.status(201).json({success:true, menuItems: menuItems.menuItems});
+const getAllMenuItemsController = async (req, res) => {
+    try {
+        const result = await restroService.getAllMenuItemsService(req.params);
+        if (!result.success) return res.status(400).json(result);
+
+        res.status(200).json({ success: true, menuItems: result.menuItems });
     }
-    catch(error) {
+    catch (error) {
         console.error('Error retrieving menu items in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const deleteMenuItemController = async(req,res) => {
-    try{
-        await restroModel.deleteMenuItem(req.params);
-        res.status(201).json({success:true, message: `Menu item ${req.params.item_id} deleted successfully`});
+const deleteMenuItemController = async (req, res) => {
+    try {
+        const result = await restroService.deleteMenuItemService(req.params);
+        if (!result.success) return res.status(400).json(result);
+
+        res.status(200).json({ success: true, message: `Menu item ${req.params.item_id} deleted successfully` });
     }
-    catch(error) {
+    catch (error) {
         console.error('Error deleting menu item in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 

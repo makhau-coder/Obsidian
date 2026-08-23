@@ -1,57 +1,81 @@
-const orderModel = require('../models/orderModels')
+const orderService = require('../services/orderService');
 
-const createOrderController = async(req,res) =>{
-    try{
-        await orderModel.createOrder(req.body);
-        res.status(201).json({success:true, message: `Order ${req.body.order_id} created successfully`});
+const createOrderController = async (req, res) => {
+    try {
+        const result = await orderService.createOrderService(req.body);
+        
+        if (!result.success) {
+            return res.status(400).json(result);
+        }
+
+        res.status(201).json({ success: true, message: `Order ${req.body.order_id} created successfully` });
     }
-    catch(error){
+    catch (error) {
         console.error('Error creating order in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const editOrderController = async(req,res) =>{
-    try{
-        await orderModel.editOrder(req.params,req.body);
-        res.status(201).json({success:true, message: `Order ${req.params.order_id} edited successfully`});
+const editOrderController = async (req, res) => {
+    try {
+        const result = await orderService.editOrderService(req.params, req.body);
+        
+        if (!result.success) {
+            return res.status(400).json(result);
+        }
+
+        res.status(200).json({ success: true, message: `Order ${req.params.order_id} edited successfully` });
     }
-    catch(error){
+    catch (error) {
         console.error('Error editing order in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const getOrderController = async(req,res) => {
-    try{
-        const order= await orderModel.getOrder(req.params);
-        res.status(201).json({success:true, order: order.order});
+const getOrderController = async (req, res) => {
+    try {
+        const result = await orderService.getOrderService(req.params);
+        
+        if (!result.success) {
+            return res.status(400).json(result);
+        }
+
+        if (!result.order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        res.status(200).json({ success: true, order: result.order });
     }
-    catch(error) {
+    catch (error) {
         console.error(`Error retrieving order ${req.params.order_id} in controller:`, error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const getAllOrdersController = async(req,res) => {
-    try{
-        const orders= await orderModel.getAllOrders();
-        res.status(201).json({success:true, orders: orders.orders});
+const getAllOrdersController = async (req, res) => {
+    try {
+        const result = await orderService.getAllOrdersService();
+        res.status(200).json({ success: true, orders: result.orders });
     }
-    catch(error) {
+    catch (error) {
         console.error('Error retrieving orders in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
-const deleteOrderController = async(req,res) => {
-    try{
-        await orderModel.deleteOrder(req.params);
-        res.status(201).json({success:true, message: `Order ${req.params.order_id} deleted successfully`});
+const deleteOrderController = async (req, res) => {
+    try {
+        const result = await orderService.deleteOrderService(req.params);
+        
+        if (!result.success) {
+            return res.status(400).json(result);
+        }
+
+        res.status(200).json({ success: true, message: `Order ${req.params.order_id} deleted successfully` });
     }
-    catch(error) {
+    catch (error) {
         console.error('Error deleting order in controller:', error);
-        res.status(500).json({success:false, message:error.message});
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
 
@@ -61,4 +85,4 @@ module.exports = {
     getOrderController,
     getAllOrdersController,
     deleteOrderController
-}
+};

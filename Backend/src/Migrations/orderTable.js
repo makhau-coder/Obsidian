@@ -3,12 +3,11 @@ const db = require('../config/db');
 
 async function createTable() {
     try {
-        // FIXED: Removed duplicate CREATE TABLE and trailing syntax errors
         const query = `
         CREATE TABLE IF NOT EXISTS orders (
-            order_id SERIAL PRIMARY KEY,
-            user_id VARCHAR(100) NOT NULL, -- FIXED: Changed to VARCHAR(100) to match users PK
-            restro_id VARCHAR(255) NOT NULL, -- FIXED: Changed to restro_id and VARCHAR(255)
+            order_id VARCHAR(100) PRIMARY KEY NOT NULL,
+            user_id VARCHAR(100) NOT NULL,
+            restro_id VARCHAR(255) NOT NULL,
             order_status VARCHAR(30) DEFAULT 'PLACED',
             total_amount DECIMAL(10,2) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

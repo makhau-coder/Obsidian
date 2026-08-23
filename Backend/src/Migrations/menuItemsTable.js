@@ -5,8 +5,8 @@ async function createTable() {
     try {
         const query = `
         CREATE TABLE IF NOT EXISTS menu_items (
-            item_id SERIAL PRIMARY KEY,
-            restro_id VARCHAR(255) NOT NULL, -- FIXED: Changed to VARCHAR to match restros PK
+            item_id VARCHAR(100) PRIMARY KEY,
+            restro_id VARCHAR(255) NOT NULL,
             item_name VARCHAR(255) NOT NULL,
             item_description TEXT,
             item_price DECIMAL(10,2) NOT NULL,

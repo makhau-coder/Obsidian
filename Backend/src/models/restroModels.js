@@ -6,8 +6,8 @@ const db = require('../config/db');
 
 const createRestro = async(restroData) => {
     try {
-        const query = 'INSERT INTO restros (restro_name, restro_location, restro_phone) VALUES ($1, $2, $3)';
-        await db.none(query, [restroData.restro_name, restroData.restro_location, restroData.restro_phone]);
+        const query = 'INSERT INTO restros (restro_id, restro_name, restro_location, restro_phone) VALUES ($1, $2, $3, $4)';
+        await db.none(query, [restroData.restro_id, restroData.restro_name, restroData.restro_location, restroData.restro_phone]);
         return {success:true, message:'Restro created successfully'};
     }
     catch(error) {

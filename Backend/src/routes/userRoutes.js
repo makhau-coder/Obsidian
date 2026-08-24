@@ -4,7 +4,7 @@ const userController = require('../controllers/userController');
 
 userRouter.use(express.json());
 
-userRouter.get('/',(req,res)=>{
+userRouter.get('/', (req, res) => {
     res.send('User service is running')
 })
 

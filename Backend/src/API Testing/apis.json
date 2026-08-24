@@ -1,0 +1,404 @@
+{
+    "info": {
+        "_postman_id": "obsidian-backend-collection",
+        "name": "Obsidian Backend API",
+        "description": "Complete collection for User, Order, and Restaurant (Restro & Menu) APIs.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        { "key": "BASE_URL",      "value": "http://localhost:5000" },
+        { "key": "user_id",       "value": "" },
+        { "key": "restro_id",     "value": "" },
+        { "key": "item_id",       "value": "" },
+        { "key": "order_id",      "value": "" },
+        { "key": "order_item_id", "value": "" }
+    ],
+    "item": [
+
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "Root - User Service",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/user/", "host": ["{{BASE_URL}}"], "path": ["user", ""] }
+                    }
+                },
+                {
+                    "name": "Create User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    // user_id is not returned directly; use Get All Users to fetch it",
+                                    "    pm.test('User created', () => pm.response.to.have.status(201));",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"user_firstname\": \"Abhay\",\n  \"user_lastname\": \"Chaudhary\",\n  \"user_gender\": \"Male\",\n  \"user_role\": \"CUSTOMER\",\n  \"user_email\": \"test@gmail.com\",\n  \"user_phone\": \"9999999999\",\n  \"user_password\": \"asdfjkl;\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/user/createUser", "host": ["{{BASE_URL}}"], "path": ["user", "createUser"] }
+                    }
+                },
+                {
+                    "name": "Get All Users",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.users && json.users.length > 0) {",
+                                    "        pm.collectionVariables.set('user_id', json.users[0].user_id);",
+                                    "        console.log('Captured user_id:', json.users[0].user_id);",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/user/getAllUsers", "host": ["{{BASE_URL}}"], "path": ["user", "getAllUsers"] }
+                    }
+                },
+                {
+                    "name": "Get User",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/user/getUser/{{user_id}}", "host": ["{{BASE_URL}}"], "path": ["user", "getUser", "{{user_id}}"] }
+                    }
+                },
+                {
+                    "name": "Edit User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"user_firstname\": \"Abhay\",\n  \"user_lastname\": \"Chaudhary\",\n  \"user_gender\": \"MALE\",\n  \"user_role\": \"CUSTOMER\",\n  \"user_email\": \"test@gmail.com\",\n  \"user_phone\": \"9999999999\",\n  \"user_password\": \"newpassword123\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/user/editUser/{{user_id}}", "host": ["{{BASE_URL}}"], "path": ["user", "editUser", "{{user_id}}"] }
+                    }
+                },
+                {
+                    "name": "Delete User",
+                    "request": {
+                        "method": "DELETE",
+                        "url": { "raw": "{{BASE_URL}}/user/deleteUser/{{user_id}}", "host": ["{{BASE_URL}}"], "path": ["user", "deleteUser", "{{user_id}}"] }
+                    }
+                }
+            ]
+        },
+
+        {
+            "name": "Restaurants & Menu",
+            "item": [
+                {
+                    "name": "Root - Restro Service",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/restro/", "host": ["{{BASE_URL}}"], "path": ["restro", ""] }
+                    }
+                },
+                {
+                    "name": "Create Restro",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.restro_id) {",
+                                    "        pm.collectionVariables.set('restro_id', json.restro_id);",
+                                    "        console.log('Captured restro_id:', json.restro_id);",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"restro_name\": \"Spicy Paradise\",\n  \"user_firstname\": \"Abhay\",\n  \"user_lastname\": \"Chaudhary\",\n  \"user_gender\": \"Male\",\n  \"user_role\": \"MERCHANT\",\n  \"restro_email\": \"restroTest@gmail.com\",\n  \"restro_location\": \"Tech Market, IIT Kharagpur\",\n  \"restro_pincode\": \"272001\",\n  \"restro_phone\": \"+918888888888\",\n  \"restro_password\": \"fer4vergds\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/restro/createRestro", "host": ["{{BASE_URL}}"], "path": ["restro", "createRestro"] }
+                    }
+                },
+                {
+                    "name": "Get All Restros",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/restro/getAllRestros", "host": ["{{BASE_URL}}"], "path": ["restro", "getAllRestros"] }
+                    }
+                },
+                {
+                    "name": "Get Restro",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/restro/getRestro/{{restro_id}}", "host": ["{{BASE_URL}}"], "path": ["restro", "getRestro", "{{restro_id}}"] }
+                    }
+                },
+                {
+                    "name": "Edit Restro",
+                    "request": {
+                        "method": "PUT",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"restro_name\": \"Spicy Paradise Updated\",\n  \"restro_location\": \"New Location, Mumbai\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/restro/editRestro/{{restro_id}}", "host": ["{{BASE_URL}}"], "path": ["restro", "editRestro", "{{restro_id}}"] }
+                    }
+                },
+                {
+                    "name": "Delete Restro",
+                    "request": {
+                        "method": "DELETE",
+                        "url": { "raw": "{{BASE_URL}}/restro/deleteRestro/{{restro_id}}", "host": ["{{BASE_URL}}"], "path": ["restro", "deleteRestro", "{{restro_id}}"] }
+                    }
+                },
+                {
+                    "name": "Create Menu Item",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.item_id) {",
+                                    "        pm.collectionVariables.set('item_id', json.item_id);",
+                                    "        console.log('Captured item_id:', json.item_id);",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"restro_id\": \"{{restro_id}}\",\n  \"item_name\": \"Paneer Tikka Masala\",\n  \"item_description\": \"Rich and creamy curry made with paneer, spices, onions, and tomatoes.\",\n  \"item_price\": 280.00,\n  \"is_available\": true\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/restro/createMenuItem", "host": ["{{BASE_URL}}"], "path": ["restro", "createMenuItem"] }
+                    }
+                },
+                {
+                    "name": "Get Menu Item",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/restro/getMenuItem/{{item_id}}", "host": ["{{BASE_URL}}"], "path": ["restro", "getMenuItem", "{{item_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get All Menu Items (by Restro)",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/restro/getAllMenuItems/{{restro_id}}", "host": ["{{BASE_URL}}"], "path": ["restro", "getAllMenuItems", "{{restro_id}}"] }
+                    }
+                },
+                {
+                    "name": "Edit Menu Item",
+                    "request": {
+                        "method": "PUT",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"item_name\": \"Paneer Tikka Masala (Spicy)\",\n  \"item_description\": \"Extra spicy paneer tikka masala.\",\n  \"item_price\": 300.00,\n  \"is_available\": false\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/restro/editMenuItem/{{item_id}}", "host": ["{{BASE_URL}}"], "path": ["restro", "editMenuItem", "{{item_id}}"] }
+                    }
+                },
+                {
+                    "name": "Delete Menu Item",
+                    "request": {
+                        "method": "DELETE",
+                        "url": { "raw": "{{BASE_URL}}/restro/deleteMenuItem/{{item_id}}", "host": ["{{BASE_URL}}"], "path": ["restro", "deleteMenuItem", "{{item_id}}"] }
+                    }
+                }
+            ]
+        },
+
+        {
+            "name": "Orders",
+            "item": [
+                {
+                    "name": "Root - Order Service",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/", "host": ["{{BASE_URL}}"], "path": ["order", ""] }
+                    }
+                },
+                {
+                    "name": "Create Order",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.order_id) {",
+                                    "        pm.collectionVariables.set('order_id', json.order_id);",
+                                    "        console.log('Captured order_id:', json.order_id);",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"restro_id\": \"{{restro_id}}\",\n  \"total_amount\": 1450.50,\n  \"order_status\": \"PLACED\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/order/createOrder", "host": ["{{BASE_URL}}"], "path": ["order", "createOrder"] }
+                    }
+                },
+                {
+                    "name": "Get All Orders",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getAllOrders", "host": ["{{BASE_URL}}"], "path": ["order", "getAllOrders"] }
+                    }
+                },
+                {
+                    "name": "Get Order",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getOrder/{{order_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "getOrder", "{{order_id}}"] }
+                    }
+                },
+                {
+                    "name": "Edit Order",
+                    "request": {
+                        "method": "PUT",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"restro_id\": \"{{restro_id}}\",\n  \"total_amount\": 1450.50,\n  \"order_status\": \"DELIVERED\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/order/editOrder/{{order_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "editOrder", "{{order_id}}"] }
+                    }
+                },
+                {
+                    "name": "Delete Order",
+                    "request": {
+                        "method": "DELETE",
+                        "url": { "raw": "{{BASE_URL}}/order/deleteOrder/{{order_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "deleteOrder", "{{order_id}}"] }
+                    }
+                }
+            ]
+        },
+
+        {
+            "name": "Ordered Items",
+            "item": [
+                {
+                    "name": "Create Ordered Item",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    pm.test('Ordered item created', () => pm.response.to.have.status(201));",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"order_id\": \"{{order_id}}\",\n  \"item_id\": \"{{item_id}}\",\n  \"item_quantity\": 2,\n  \"item_amount\": 560.00\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/order/createOrderedItem", "host": ["{{BASE_URL}}"], "path": ["order", "createOrderedItem"] }
+                    }
+                },
+                {
+                    "name": "Get All Ordered Items (by Order)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.orderedItems && json.orderedItems.length > 0) {",
+                                    "        pm.collectionVariables.set('order_item_id', json.orderedItems[0].order_item_id);",
+                                    "        console.log('Captured order_item_id:', json.orderedItems[0].order_item_id);",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getAllOrderedItems/{{order_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "getAllOrderedItems", "{{order_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get Ordered Item",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getOrderedItem/{{order_item_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "getOrderedItem", "{{order_item_id}}"] }
+                    }
+                },
+                {
+                    "name": "Edit Ordered Item",
+                    "request": {
+                        "method": "PUT",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"item_quantity\": 3,\n  \"item_amount\": 840.00\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/order/editOrderedItem/{{order_item_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "editOrderedItem", "{{order_item_id}}"] }
+                    }
+                },
+                {
+                    "name": "Delete Ordered Item",
+                    "request": {
+                        "method": "DELETE",
+                        "url": { "raw": "{{BASE_URL}}/order/deleteOrderedItem/{{order_item_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "deleteOrderedItem", "{{order_item_id}}"] }
+                    }
+                }
+            ]
+        }
+
+    ]
+}

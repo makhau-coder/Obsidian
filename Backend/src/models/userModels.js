@@ -52,7 +52,7 @@ const deleteUser = async (userParams) => {
     try {
         const query = `DELETE from users WHERE user_id=$1`;
         await db.none(query, [userParams.user_id]);
-        return { success: true, message: `User ${user_id} deleted successfully` };
+        return { success: true, message: `User ${userParams.user_id} deleted successfully` };
     }
     catch (error) {
         console.log('Error deleting users in model:', error);

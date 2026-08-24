@@ -8,8 +8,8 @@ const createRestroController = async (req, res) => {
     try {
         const result = await restroService.createRestroService(req.body);
         if (!result.success) return res.status(400).json(result);
-        
-        res.status(201).json({ success: true, message: `Restro created successfully` });
+
+        res.status(201).json({ success: true, message: `Restro created successfully`, restro_id: result.restro_id });
     }
     catch (error) {
         console.error('Error creating restro in controller:', error);
@@ -77,7 +77,7 @@ const createMenuItemController = async (req, res) => {
         const result = await restroService.createMenuItemService(req.body);
         if (!result.success) return res.status(400).json(result);
 
-        res.status(201).json({ success: true, message: `Menu item created successfully` });
+        res.status(201).json({ success: true, message: `Menu item ${result.item_id} created successfully`, item_id: result.item_id });
     }
     catch (error) {
         console.error('Error creating menu item in controller:', error);

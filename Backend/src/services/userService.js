@@ -28,8 +28,8 @@ const createUserService = async (userData) => {
 
         userData.user_password = await authentication.hashPassword(userData.user_password);
 
-        const message=await userModel.createUser(user_id, userData);
-        return { success: true, message: message.message, user_id:user_id };
+        const message = await userModel.createUser(user_id, userData);
+        return { success: true, message: message.message, user_id: user_id };
     } catch (error) {
         console.log('Error creating user in service:', error);
         throw error;
@@ -66,7 +66,7 @@ const editUserService = async (userParams, userData) => {
             userData.user_password = authentication.hashPassword(userData.user_password);
         }
 
-        const message=await userModel.editUser(userParams, userData);
+        const message = await userModel.editUser(userParams, userData);
         return { success: true, message: message.message };
     } catch (error) {
         console.log('Error editing user in service:', error);
@@ -82,7 +82,7 @@ const getUserService = async (userParams) => {
         }
 
         const user = await userModel.getUser(userParams);
-        return {success: true, user:user};
+        return { success: true, user: user };
     } catch (error) {
         console.log('Error retrieving user in service:', error);
         throw error;
@@ -92,7 +92,7 @@ const getUserService = async (userParams) => {
 const getAllUsersService = async () => {
     try {
         const users = await userModel.getAllUsers();
-        return {success: true, users:users};
+        return { success: true, users: users };
     } catch (error) {
         console.log('Error retrieving all users in service:', error);
         throw error;
@@ -106,7 +106,7 @@ const deleteUserService = async (userParams) => {
             return { success: false, message: 'User ID is missing' };
         }
 
-        const message=await userModel.deleteUser(userParams);
+        const message = await userModel.deleteUser(userParams);
         return { success: true, message: message.message };
     } catch (error) {
         console.log('Error deleting user in service:', error);

@@ -35,6 +35,10 @@ const createRestroService = async (data) => {
 
         const user_message = await userService.createUserService(userData);
 
+        if (!user_message.success) {
+            return { success: false, message: user_message.message };
+        }
+
         const restroData = {
             restro_id: restro_id,
             restro_name: data.restro_name,
@@ -44,7 +48,7 @@ const createRestroService = async (data) => {
         }
 
         const restro_message = await restroModel.createRestro(restroData);
-        return { success: true, message: restro_message.message + "\n" + user_message.message };
+        return { success: true, message: restro_message.message + "\n" + user_message.message, restro_id: restro_id };
     } catch (error) {
         console.log('Error creating restro in service:', error);
         throw error;
@@ -62,7 +66,7 @@ const editRestroService = async (restroParams, restroData) => {
         }
 
         await restroModel.editRestro(restroParams, restroData);
-        return { success: true, message: 'Restro edited successfully via service' };
+        return { success: true, message: 'Restro edited successfully via service', restro_id: restroParams.restro_id };
     } catch (error) {
         console.log('Error editing restro in service:', error);
         throw error;
@@ -117,8 +121,11 @@ const createMenuItemService = async (menuData) => {
             return { success: false, message: 'Restaurant ID is required for a menu item' };
         }
 
+        const item_id = miscellaneousFunctions.generateUniqueId('ITEM');
+        menuData.item_id = item_id;
+
         await restroModel.createMenuItem(menuData);
-        return { success: true, message: 'Menu item created successfully via service' };
+        return { success: true, message: 'Menu item created successfully', item_id: item_id };
     } catch (error) {
         console.log('Error creating menu item in service:', error);
         throw error;

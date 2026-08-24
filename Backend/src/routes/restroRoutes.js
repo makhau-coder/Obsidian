@@ -2,7 +2,9 @@ const express = require('express');
 const restroRouter = express.Router();
 const restroController = require('../controllers/restroController');
 
-restroRouter.get('/',(req,res)=>{
+restroRouter.use(express.json());
+
+restroRouter.get('/', (req, res) => {
     res.send('Restro and Menu service is running')
 })
 

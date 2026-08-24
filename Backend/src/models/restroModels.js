@@ -18,8 +18,8 @@ const createRestro = async (restroData) => {
 
 const editRestro = async (restroParams, restroData) => {
     try {
-        const query = `UPDATE restros SET restro_name=$1, restro_location=$2, restro_phone=$3 WHERE restro_id=$4`;
-        await db.none(query, [restroData.restro_name, restroData.restro_location, restroData.restro_phone, restroParams.restro_id]);
+        const query = `UPDATE restros SET restro_name=$1, restro_location=$2 WHERE restro_id=$3`;
+        await db.none(query, [restroData.restro_name, restroData.restro_location, restroParams.restro_id]);
         return { success: true, message: 'Restro updated successfully' };
     }
     catch (error) {

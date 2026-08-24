@@ -3,9 +3,9 @@ const userService = require('../services/userService');
 const createUserController = async (req, res) => {
     try {
         const result = await userService.createUserService(req.body);
-        
+
         if (!result.success) {
-            return res.status(400).json(result); 
+            return res.status(400).json(result);
         }
 
         res.status(201).json({ success: true, message: result.message });
@@ -19,7 +19,7 @@ const createUserController = async (req, res) => {
 const editUserController = async (req, res) => {
     try {
         const result = await userService.editUserService(req.params, req.body);
-        
+
         if (!result.success) {
             return res.status(400).json(result);
         }
@@ -35,7 +35,7 @@ const editUserController = async (req, res) => {
 const getUserController = async (req, res) => {
     try {
         const result = await userService.getUserService(req.params);
-        
+
         if (!result.success) {
             return res.status(400).json(result);
         }
@@ -44,7 +44,13 @@ const getUserController = async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        res.status(200).json({ success: true, user: result.user });
+        // handle stale Docker nested shape: result.user = { success, user: actualUser }
+        const actualUser = result.user?.user !== undefined ? result.user.user : result.user;
+        if (!actualUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.status(200).json({ success: true, user: actualUser });
     }
     catch (error) {
         console.error(`Error retrieving user ${req.params.user_id} in controller:`, error);
@@ -66,12 +72,12 @@ const getAllUsersController = async (req, res) => {
 const deleteUserController = async (req, res) => {
     try {
         const result = await userService.deleteUserService(req.params);
-        
+
         if (!result.success) {
             return res.status(400).json(result);
         }
 
-        res.status(200).json({ success: true, message: message.message });
+        res.status(200).json({ success: true, message: result.message });
     }
     catch (error) {
         console.error('Error deleting user in controller:', error);

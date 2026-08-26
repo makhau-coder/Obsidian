@@ -5,6 +5,7 @@ const restroRoutes = require('./routes/restroRoutes');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const db = require('./config/db');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -19,6 +20,7 @@ const errorHandler = (err, req, res, next) => {
 
 //***************Middlewares***************
 app.use(express.json());
+app.use(cookieParser());
 app.use(errorHandler);
 app.use('/order', orderRoutes);
 app.use('/restro', restroRoutes);

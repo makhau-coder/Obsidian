@@ -33,7 +33,7 @@ const comparePassword = async (user_email, user_pass) => {
 const verifyJWT = async (token) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-        return { success: true, data: decoded };
+        return decoded;
     }
     catch (error) {
         console.log('Error verifying access token:', error);
@@ -74,7 +74,7 @@ const generateRefreshToken = async (user) => {
             }
         );
         const decoded = jwt.decode(token);
-        return {token,jti,expiresAt: new Date(decoded.exp * 1000)
+        return {refreshToken: token, jti, expiresAt: new Date(decoded.exp * 1000)
         };
     }
     catch (error) {

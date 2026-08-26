@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const authFunctions = require('../auth/authFunctions')
 const userService = require('../services/userService')
 const authModel = require('../models/authModels')
@@ -42,17 +43,15 @@ const registerService = async(userData)=> {
     }
 }
 
-const jwt = require('jsonwebtoken');
-
 const refreshService = async (refreshToken) => {
     try {
-        const decoded = jwt.verify(refreshToken,process.env.JWT_REFRESH_SECRET);
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         const { user_id, jti } = decoded;
-        const session = await authModel.getRefreshToken(jti);
+        const session = await authModel.getJTI(jti);
         if (!session) {
-            return {success: false,message: 'Refresh token is invalid or revoked'};
+            throw new Error('Refresh token is invalid or revoked');
         }
-        const accessToken =authFunctions.generateAccessToken({user_id});
+        const accessToken = await authFunctions.generateAccessToken({user_id});
         return accessToken;
     } catch (error) {
         console.error('Error in refresh service:', error);
@@ -60,8 +59,21 @@ const refreshService = async (refreshToken) => {
     }
 };
 
+const logoutService = async (refreshToken) => {
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const { jti } = decoded;
+        await authModel.revokeJTI(jti);
+        console.log('Refresh token revoked:', jti);
+    } catch (error) {
+        console.error('Error in logout service:', error);
+        throw error;
+    }
+};
+
 module.exports = {
     loginService,
     registerService,
-    refreshService
+    refreshService,
+    logoutService
 }

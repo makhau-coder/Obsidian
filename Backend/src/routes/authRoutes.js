@@ -11,5 +11,6 @@ authRouter.get('/', (req, res) => {
 authRouter.post('/login', authController.loginController)
 authRouter.post('/register', authController.registerController)
 authRouter.post('/refresh', authController.refreshController)
+authRouter.post('/logout', authController.logoutController)
 
 module.exports = authRouter

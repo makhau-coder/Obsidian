@@ -3,6 +3,7 @@ const express = require('express');
 const orderRoutes = require('./routes/orderRoutes');
 const restroRoutes = require('./routes/restroRoutes');
 const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 const db = require('./config/db');
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(errorHandler);
 app.use('/order', orderRoutes);
 app.use('/restro', restroRoutes);
 app.use('/user', userRoutes);
+app.use('/auth', authRoutes);
 
 
 //***************Server***************
@@ -48,3 +50,10 @@ db.one('SELECT NOW() AS current_time')
     console.error('Database connection failed');
     console.error(error);
   });
+
+
+//***************Error Handler***************
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ success: false, message: 'Internal server error' });
+});

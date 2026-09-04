@@ -11,8 +11,8 @@ const createOrderService = async (orderData) => {
             orderData.order_status = orderData.order_status.trim().toUpperCase();
         }
 
-        await orderModel.createOrder(orderData);
-        return { success: true, message: 'Order created successfully', order_id: order_id };
+        const result = await orderModel.createOrder(orderData);
+        return result; 
     } catch (error) {
         console.log('Error creating order in service:', error);
         throw error;
@@ -22,15 +22,16 @@ const createOrderService = async (orderData) => {
 const editOrderService = async (orderParams, orderData) => {
     try {
         if (!orderParams.order_id) {
-            return { success: false, message: 'Order ID is missing' };
+            console.log('Validation Error: Order ID is missing');
+            throw new Error('Order ID is missing');
         }
 
         if (orderData.order_status) {
             orderData.order_status = orderData.order_status.trim().toUpperCase();
         }
 
-        await orderModel.editOrder(orderParams, orderData);
-        return { success: true, message: 'Order edited successfully via service' };
+        const result = await orderModel.editOrder(orderParams, orderData);
+        return result;
     } catch (error) {
         console.log('Error editing order in service:', error);
         throw error;
@@ -40,7 +41,8 @@ const editOrderService = async (orderParams, orderData) => {
 const getOrderService = async (orderParams) => {
     try {
         if (!orderParams.order_id) {
-            return { success: false, message: 'Order ID is missing' };
+            console.log('Validation Error: Order ID is missing');
+            throw new Error('Order ID is missing');
         }
 
         const order = await orderModel.getOrder(orderParams);
@@ -64,11 +66,12 @@ const getAllOrdersService = async () => {
 const deleteOrderService = async (orderParams) => {
     try {
         if (!orderParams.order_id) {
-            return { success: false, message: 'Order ID is missing' };
+            console.log('Validation Error: Order ID is missing');
+            throw new Error('Order ID is missing');
         }
 
-        await orderModel.deleteOrder(orderParams);
-        return { success: true, message: 'Order deleted successfully via service' };
+        const result = await orderModel.deleteOrder(orderParams);
+        return result;
     } catch (error) {
         console.log('Error deleting order in service:', error);
         throw error;
@@ -82,15 +85,17 @@ const deleteOrderService = async (orderParams) => {
 const createOrderedItemService = async (orderedItemData) => {
     try {
         if (!orderedItemData.order_id) {
-            return { success: false, message: 'Order ID is required for an ordered item' };
+            console.log('Validation Error: Order ID is required for an ordered item');
+            throw new Error('Order ID is required for an ordered item');
         }
 
         if (!orderedItemData.item_id) {
-            return { success: false, message: 'Item ID is required for an ordered item' };
+            console.log('Validation Error: Item ID is required for an ordered item');
+            throw new Error('Item ID is required for an ordered item');
         }
 
-        await orderedItemsModel.createOrderedItem(orderedItemData);
-        return { success: true, message: 'Ordered item created successfully' };
+        const result = await orderedItemsModel.createOrderedItem(orderedItemData);
+        return result;
     } catch (error) {
         console.log('Error creating ordered item in service:', error);
         throw error;
@@ -100,11 +105,12 @@ const createOrderedItemService = async (orderedItemData) => {
 const editOrderedItemService = async (orderedItemParams, orderedItemData) => {
     try {
         if (!orderedItemParams.order_item_id) {
-            return { success: false, message: 'Ordered item ID is missing' };
+            console.log('Validation Error: Ordered item ID is missing');
+            throw new Error('Ordered item ID is missing');
         }
 
-        await orderedItemsModel.editOrderedItem(orderedItemParams, orderedItemData);
-        return { success: true, message: 'Ordered item edited successfully via service' };
+        const result = await orderedItemsModel.editOrderedItem(orderedItemParams, orderedItemData);
+        return result;
     } catch (error) {
         console.log('Error editing ordered item in service:', error);
         throw error;
@@ -114,7 +120,8 @@ const editOrderedItemService = async (orderedItemParams, orderedItemData) => {
 const getOrderedItemService = async (orderedItemParams) => {
     try {
         if (!orderedItemParams.order_item_id) {
-            return { success: false, message: 'Ordered item ID is missing' };
+            console.log('Validation Error: Ordered item ID is missing');
+            throw new Error('Ordered item ID is missing');
         }
 
         const orderedItem = await orderedItemsModel.getOrderedItem(orderedItemParams);
@@ -128,7 +135,8 @@ const getOrderedItemService = async (orderedItemParams) => {
 const getAllOrderedItemsService = async (orderedItemParams) => {
     try {
         if (!orderedItemParams.order_id) {
-            return { success: false, message: 'Order ID is missing' };
+            console.log('Validation Error: Order ID is missing');
+            throw new Error('Order ID is missing');
         }
 
         const orderedItems = await orderedItemsModel.getAllOrderedItems(orderedItemParams);
@@ -142,11 +150,12 @@ const getAllOrderedItemsService = async (orderedItemParams) => {
 const deleteOrderedItemService = async (orderedItemParams) => {
     try {
         if (!orderedItemParams.order_item_id) {
-            return { success: false, message: 'Ordered item ID is missing' };
+            console.log('Validation Error: Ordered item ID is missing');
+            throw new Error('Ordered item ID is missing');
         }
 
-        await orderedItemsModel.deleteOrderedItem(orderedItemParams);
-        return { success: true, message: 'Ordered item deleted successfully via service' };
+        const result = await orderedItemsModel.deleteOrderedItem(orderedItemParams);
+        return result;
     } catch (error) {
         console.log('Error deleting ordered item in service:', error);
         throw error;

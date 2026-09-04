@@ -1,0 +1,82 @@
+{
+  "status_codes": [
+    {
+      "code": 400,
+      "message": "Bad Request",
+      "category": "Client Error",
+      "description": "The server cannot process the request due to a client error."
+    },
+    {
+      "code": 401,
+      "message": "Unauthorized",
+      "category": "Client Error",
+      "description": "The request requires user authentication."
+    },
+    {
+      "code": 403,
+      "message": "Forbidden",
+      "category": "Client Error",
+      "description": "The server understood the request, but refuses to authorize it."
+    },
+    {
+      "code": 404,
+      "message": "Not Found",
+      "category": "Client Error",
+      "description": "The server cannot find the requested resource."
+    },
+    {
+      "code": 405,
+      "message": "Method Not Allowed",
+      "category": "Client Error",
+      "description": "The request method is known by the server but has been disabled."
+    },
+    {
+      "code": 408,
+      "message": "Request Timeout",
+      "category": "Client Error",
+      "description": "The server timed out waiting for the request."
+    },
+    {
+      "code": 409,
+      "message": "Conflict",
+      "category": "Client Error",
+      "description": "The request could not be completed because of a conflict in the request."
+    },
+    {
+      "code": 429,
+      "message": "Too Many Requests",
+      "category": "Client Error",
+      "description": "The user has sent too many requests in a given amount of time."
+    },
+    {
+      "code": 500,
+      "message": "Internal Server Error",
+      "category": "Server Error",
+      "description": "The server has encountered a situation it does not know how to handle."
+    },
+    {
+      "code": 501,
+      "message": "Not Implemented",
+      "category": "Server Error",
+      "description": "The server does not support the functionality required to fulfill the request."
+    },
+    {
+      "code": 502,
+      "message": "Bad Gateway",
+      "category": "Server Error",
+      "description": "The server received an invalid response from the upstream server."
+    },
+    {
+      "code": 503,
+      "message": "Service Unavailable",
+      "category": "Server Error",
+      "description": "The server is not ready to handle the request."
+    },
+    {
+      "code": 504,
+      "message": "Gateway Timeout",
+      "category": "Server Error",
+      "description": "The server is acting as a gateway and did not receive a timely response."
+    }
+  ]
+}

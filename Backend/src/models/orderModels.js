@@ -2,9 +2,9 @@ const db = require('../config/db');
 
 const createOrder = async (orderData) => {
     try {
-        const query = 'INSERT INTO orders (order_id, user_id, restro_id, total_amount, order_status, created_at) VALUES ($1, $2, $3, $4, $5, $6)';
-        await db.none(query, [orderData.order_id, orderData.user_id, orderData.restro_id, orderData.total_amount, orderData.order_status || 'PLACED', new Date()]);
-        return { success: true, message: 'Order created successfully' };
+        const query = 'INSERT INTO orders (order_id, user_id, restro_id, total_amount, order_status, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
+        const result = await db.one(query, [orderData.order_id, orderData.user_id, orderData.restro_id, orderData.total_amount, orderData.order_status || 'PLACED', new Date()]);
+        return result;
     }
     catch (error) {
         console.log('Error creating order in model:', error);
@@ -14,9 +14,9 @@ const createOrder = async (orderData) => {
 
 const editOrder = async (orderParams, orderData) => {
     try {
-        const query = `UPDATE orders SET user_id=$1, restro_id=$2, total_amount=$3, order_status=$4 WHERE order_id=$5`;
-        await db.none(query, [orderData.user_id, orderData.restro_id, orderData.total_amount, orderData.order_status, orderParams.order_id]);
-        return { success: true, message: 'Order updated successfully' };
+        const query = `UPDATE orders SET user_id=$1, restro_id=$2, total_amount=$3, order_status=$4 WHERE order_id=$5 RETURNING *`;
+        const result = await db.one(query, [orderData.user_id, orderData.restro_id, orderData.total_amount, orderData.order_status, orderParams.order_id]);
+        return result;
     }
     catch (error) {
         console.log('Error updating order in model:', error);
@@ -27,8 +27,8 @@ const editOrder = async (orderParams, orderData) => {
 const getOrder = async (orderParams) => {
     try {
         const query = `SELECT * from orders WHERE order_id=$1`;
-        const order = await db.oneOrNone(query, [orderParams.order_id]);
-        return { success: true, order: order };
+        const result = await db.oneOrNone(query, [orderParams.order_id]);
+        return result;
     }
     catch (error) {
         console.log('Error finding order in model:', error);
@@ -39,8 +39,8 @@ const getOrder = async (orderParams) => {
 const getAllOrders = async () => {
     try {
         const query = `SELECT * from orders ORDER BY created_at DESC`;
-        const orders = await db.any(query);
-        return { success: true, orders: orders };
+        const result = await db.any(query);
+        return result;
     }
     catch (error) {
         console.log('Error returning all orders in model:', error);
@@ -50,9 +50,9 @@ const getAllOrders = async () => {
 
 const deleteOrder = async (orderParams) => {
     try {
-        const query = `DELETE from orders WHERE order_id=$1`;
-        await db.none(query, [orderParams.order_id]);
-        return { success: true, message: 'Order deleted successfully' };
+        const query = `DELETE from orders WHERE order_id=$1 RETURNING *`;
+        const result = await db.one(query, [orderParams.order_id]);
+        return result;
     }
     catch (error) {
         console.log('Error deleting order in model:', error);

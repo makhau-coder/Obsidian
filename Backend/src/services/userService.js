@@ -3,33 +3,24 @@ const regex = require('../models/regularExpressions');
 const authentication = require('../auth/authFunctions');
 const miscellaneousFunctions = require('../services/functions')
 
-// Helper function to capitalize the first letter and make the rest lowercase
-const INITCAP = (str) => {
-    if (!str) return str;
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-};
-
 const createUserService = async (userData) => {
     try {
-
         const user_id = miscellaneousFunctions.generateUniqueId("USER");
         userData.user_firstname = miscellaneousFunctions.capitalizeFirstLetter(userData.user_firstname);
         userData.user_lastname = miscellaneousFunctions.capitalizeFirstLetter(userData.user_lastname);
         userData.user_gender = (userData.user_gender).trim().toUpperCase();
-
         if (!regex.emailRegex.test(userData.user_email)) {
-            return { success: false, message: 'Invalid email id' };
+            console.log('Validation Error: Invalid email id');
+            throw new Error('Invalid email id');
         }
         userData.user_email = (userData.user_email).toLowerCase();
-
         if (!regex.phoneRegex.test(userData.user_phone)) {
-            return { success: false, message: 'Invalid phone number' };
+            console.log('Validation Error: Invalid phone number');
+            throw new Error('Invalid phone number');
         }
-
         userData.user_password = await authentication.hashPassword(userData.user_password);
-
-        const message = await userModel.createUser(user_id, userData);
-        return { success: true, message: message.message, user_id: user_id };
+        const result = await userModel.createUser(user_id, userData);        
+        return result; 
     } catch (error) {
         console.log('Error creating user in service:', error);
         throw error;
@@ -38,7 +29,6 @@ const createUserService = async (userData) => {
 
 const editUserService = async (userParams, userData) => {
     try {
-        // Apply sanitization and validation if the fields are present in the update request
         if (userData.firstname) {
             userData.user_firstname = miscellaneousFunctions.capitalizeFirstLetter(userData.user_firstname);
         }
@@ -51,23 +41,25 @@ const editUserService = async (userParams, userData) => {
 
         if (userData.user_email) {
             if (!regex.emailRegex.test(userData.user_email)) {
-                return { success: false, message: 'Invalid email id' };
+                console.log('Validation Error: Invalid email id');
+                throw new Error('Invalid email id');
             }
             userData.user_email = (userData.user_email).toLowerCase();
         }
 
         if (userData.user_phone) {
             if (!regex.phoneRegex.test(userData.user_phone)) {
-                return { success: false, message: 'Invalid phone number' };
+                console.log('Validation Error: Invalid phone number');
+                throw new Error('Invalid phone number');
             }
         }
 
         if (userData.user_password) {
-            userData.user_password = authentication.hashPassword(userData.user_password);
+            userData.user_password = await authentication.hashPassword(userData.user_password); // Added await here just in case!
         }
 
-        const message = await userModel.editUser(userParams, userData);
-        return { success: true, message: message.message };
+        const result = await userModel.editUser(userParams, userData);
+        return result;
     } catch (error) {
         console.log('Error editing user in service:', error);
         throw error;
@@ -75,14 +67,20 @@ const editUserService = async (userParams, userData) => {
 }
 
 const getUserService = async (userParams) => {
-    try {
-        // Basic validation to ensure the ID is passed
-        if (!userParams.user_id) {
-            return { success: false, message: 'User ID is missing' };
-        }
 
-        const user = await userModel.getUser(userParams);
-        return { success: true, user: user };
+    try {
+        if (!userParams.user_id && !userParams.user_email) {
+            console.log('Validation Error: User ID and email both are missing');
+            throw new Error('User ID and email both are missing');
+        }
+        if (userParams.user_id) {
+            const user = await userModel.getUserbyId(userParams);
+            return user;
+        }
+        else if (userParams.user_email) {
+            const user = await userModel.getUserbyEmail(userParams);
+            return user;
+        }
     } catch (error) {
         console.log('Error retrieving user in service:', error);
         throw error;
@@ -92,7 +90,7 @@ const getUserService = async (userParams) => {
 const getAllUsersService = async () => {
     try {
         const users = await userModel.getAllUsers();
-        return { success: true, users: users };
+        return users;
     } catch (error) {
         console.log('Error retrieving all users in service:', error);
         throw error;
@@ -101,13 +99,13 @@ const getAllUsersService = async () => {
 
 const deleteUserService = async (userParams) => {
     try {
-        // Basic validation to ensure the ID is passed before deleting
         if (!userParams.user_id) {
-            return { success: false, message: 'User ID is missing' };
+            console.log('Validation Error: User ID is missing');
+            throw new Error('User ID is missing');
         }
 
-        const message = await userModel.deleteUser(userParams);
-        return { success: true, message: message.message };
+        const result = await userModel.deleteUser(userParams);
+        return result; 
     } catch (error) {
         console.log('Error deleting user in service:', error);
         throw error;

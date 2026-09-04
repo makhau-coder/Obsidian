@@ -1,6 +1,76 @@
-# Obsidian Backend
+﻿# Obsidian — Food Ordering Platform
 
-A RESTful backend for a food ordering platform built with **Node.js**, **Express**, and **PostgreSQL** (via pg-promise). Runs via Docker Compose.
+A full-stack food ordering platform with three portals — **Customer**, **Merchant**, and **Admin** — built as a monorepo.
+
+```
+Mega-Backend/
+├── Backend/    → Node.js + Express REST API + PostgreSQL
+└── Frontend/   → React SPA (Vite + TanStack Router)
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Node.js, Express 5, pg-promise (PostgreSQL) |
+| Auth | JWT (access + refresh tokens), bcrypt, cookie-parser |
+| Database | PostgreSQL 16 (Docker), pgAdmin 4 |
+| Frontend | React 19, Vite 8, TanStack Router, TanStack Query |
+| Styling | Tailwind CSS v4, custom design tokens |
+| Dev | Docker Compose, nodemon |
+
+---
+
+## Project Structure
+
+```
+Backend/
+├── src/
+│   ├── server.js            ← Express app entry point
+│   ├── auth/
+│   │   ├── authFunctions.js ← JWT helpers, bcrypt
+│   │   └── authMiddleware.js
+│   ├── config/
+│   │   └── db.js            ← pg-promise connection
+│   ├── controllers/         ← Request handlers
+│   ├── models/              ← DB query functions
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── userRoutes.js
+│   │   ├── restroRoutes.js
+│   │   └── orderRoutes.js
+│   ├── services/            ← Business logic
+│   ├── Migrations/          ← One-time table creation scripts
+│   └── errorCodes.json
+├── .env
+├── Dockerfile
+└── docker-compose.yml
+
+Frontend/
+├── src/
+│   ├── main.jsx             ← React entry point
+│   ├── router.jsx           ← TanStack Router setup
+│   ├── routeTree.gen.js     ← Auto-generated (do not edit)
+│   ├── routes/              ← File-based routing
+│   │   ├── __root.jsx
+│   │   ├── index.jsx
+│   │   ├── _auth.jsx
+│   │   ├── _auth/login.jsx
+│   │   ├── _auth/register.jsx
+│   │   ├── admin/
+│   │   ├── customer/
+│   │   └── merchant/
+│   ├── pages/               ← Page components
+│   ├── components/          ← Shared UI (auth/, cards/, common/, forms/)
+│   ├── layouts/             ← AdminLayout, CustomerLayout, MerchantLayout, AuthLayout
+│   ├── data/mock.js         ← Placeholder data (replace with API calls)
+│   ├── styles.css           ← Tailwind v4 + design tokens
+│   └── main.css             ← Custom utility classes
+├── index.html
+└── vite.config.js
+```
 
 ---
 
@@ -18,7 +88,7 @@ erDiagram
         VARCHAR(20)   user_role        "CUSTOMER | MERCHANT | ADMIN"
         VARCHAR(100)  user_email       "UNIQUE NOT NULL"
         VARCHAR(20)   user_phone
-        VARCHAR(255)  user_password    "NOT NULL"
+        VARCHAR(255)  user_password    "NOT NULL (bcrypt)"
         TIMESTAMP     created_at       "DEFAULT NOW()"
     }
 
@@ -59,109 +129,72 @@ erDiagram
         TIMESTAMP     created_at       "DEFAULT NOW()"
     }
 
-    users         ||--o{ restros        : "owns (restro_owner_id)"
-    users         ||--o{ orders         : "places (user_id)"
-    restros       ||--o{ menu_items     : "has (restro_id)"
-    restros       ||--o{ orders         : "receives (restro_id)"
-    orders        ||--o{ ordered_items  : "contains (order_id)"
-    menu_items    ||--o{ ordered_items  : "referenced by (item_id)"
+    users         ||--o{ restros        : "owns"
+    users         ||--o{ orders         : "places"
+    restros       ||--o{ menu_items     : "has"
+    restros       ||--o{ orders         : "receives"
+    orders        ||--o{ ordered_items  : "contains"
+    menu_items    ||--o{ ordered_items  : "referenced by"
+```
+
+> All foreign keys use `ON DELETE CASCADE`.
+
+---
+
+## Getting Started
+
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Node.js 22+](https://nodejs.org/)
+
+---
+
+### 1. Configure Environment
+
+Edit `Backend/.env`:
+
+```env
+PORT=5000
+
+POSTGRES_DB=obsidian
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_PORT=5432
+
+PGADMIN_EMAIL=admin@example.com
+PGADMIN_PASSWORD=admin
+PGADMIN_PORT=5050
+
+IS_AUTH=false
+JWT_ACCESS_SECRET=<your-secret>
+JWT_REFRESH_SECRET=<your-secret>
+JWT_ACCESS_EXPIRES=15m
+JWT_REFRESH_EXPIRES=7d
 ```
 
 ---
 
-## Table Details
+### 2. Start the Backend (Docker)
 
-### `users`
-| Column | Type | Constraints |
-|---|---|---|
-| `user_id` | VARCHAR(100) | PRIMARY KEY |
-| `user_firstname` | VARCHAR(100) | NOT NULL |
-| `user_lastname` | VARCHAR(100) | NOT NULL |
-| `user_gender` | VARCHAR(20) | CHECK (`MALE`, `FEMALE`, `OTHERS`) |
-| `user_role` | VARCHAR(20) | CHECK (`CUSTOMER`, `MERCHANT`, `ADMIN`) |
-| `user_email` | VARCHAR(100) | UNIQUE, NOT NULL |
-| `user_phone` | VARCHAR(20) | |
-| `user_password` | VARCHAR(255) | NOT NULL (bcrypt hashed) |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
-
----
-
-### `restros`
-| Column | Type | Constraints |
-|---|---|---|
-| `restro_id` | VARCHAR(255) | PRIMARY KEY |
-| `restro_owner_id` | VARCHAR(100) | NOT NULL, FK → `users.user_id` ON DELETE CASCADE |
-| `restro_name` | VARCHAR(100) | NOT NULL |
-| `restro_location` | TEXT | NOT NULL |
-| `restro_pincode` | VARCHAR(7) | NOT NULL |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
-
----
-
-### `menu_items`
-| Column | Type | Constraints |
-|---|---|---|
-| `item_id` | VARCHAR(100) | PRIMARY KEY |
-| `restro_id` | VARCHAR(255) | NOT NULL, FK → `restros.restro_id` ON DELETE CASCADE |
-| `item_name` | VARCHAR(255) | NOT NULL |
-| `item_description` | TEXT | |
-| `item_price` | DECIMAL(10,2) | NOT NULL |
-| `is_available` | BOOLEAN | DEFAULT TRUE |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
-
----
-
-### `orders`
-| Column | Type | Constraints |
-|---|---|---|
-| `order_id` | VARCHAR(100) | PRIMARY KEY, NOT NULL |
-| `user_id` | VARCHAR(100) | NOT NULL, FK → `users.user_id` ON DELETE CASCADE |
-| `restro_id` | VARCHAR(255) | NOT NULL, FK → `restros.restro_id` ON DELETE CASCADE |
-| `order_status` | VARCHAR(30) | DEFAULT `PLACED` |
-| `total_amount` | DECIMAL(10,2) | NOT NULL |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
-
----
-
-### `ordered_items`
-| Column | Type | Constraints |
-|---|---|---|
-| `order_item_id` | SERIAL | PRIMARY KEY (auto-increment) |
-| `order_id` | VARCHAR(100) | NOT NULL, FK → `orders.order_id` ON DELETE CASCADE |
-| `item_id` | VARCHAR(100) | NOT NULL, FK → `menu_items.item_id` ON DELETE CASCADE |
-| `item_quantity` | INTEGER | NOT NULL |
-| `item_amount` | DECIMAL(10,2) | NOT NULL |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
-
----
-
-## Foreign Key Relationships
-
-```
-users ──────────────────┬──► restros.restro_owner_id   (1 user owns many restros)
-                        └──► orders.user_id              (1 user places many orders)
-
-restros ────────────────┬──► menu_items.restro_id       (1 restro has many menu items)
-                        └──► orders.restro_id            (1 restro receives many orders)
-
-orders  ───────────────────► ordered_items.order_id     (1 order contains many items)
-
-menu_items ────────────────► ordered_items.item_id      (1 menu item in many order lines)
-```
-
-> All foreign keys use `ON DELETE CASCADE` — deleting a parent automatically removes all its children.
-
----
-
-## Running the Project
-
-### Start with Docker Compose
 ```bash
+cd Backend
 docker compose up
 ```
 
-### Run Migrations (one-time setup)
+| Service | URL |
+|---|---|
+| Express API | http://localhost:5000 |
+| PostgreSQL | localhost:5432 |
+| pgAdmin | http://localhost:5050 |
+
+---
+
+### 3. Run Migrations (one-time)
+
+Run in order — child tables depend on parent tables:
+
 ```bash
+cd Backend
 node src/Migrations/userTable.js
 node src/Migrations/restroTable.js
 node src/Migrations/menuItemsTable.js
@@ -169,53 +202,109 @@ node src/Migrations/orderTable.js
 node src/Migrations/orderedItemsTable.js
 ```
 
-> Run migrations **in order** — child tables depend on parent tables existing first.
+---
+
+### 4. Start the Frontend
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+Frontend runs at **http://localhost:5173**
 
 ---
 
-## API Routes
+## API Reference
 
-### User — `/user`
+### Auth — `/auth`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/user/createUser` | Create a new user |
-| PUT | `/user/editUser/:user_id` | Edit user details |
+| POST | `/auth/register` | Register a new user |
+| POST | `/auth/login` | Login, returns JWT in cookies |
+| POST | `/auth/refresh` | Refresh access token |
+| POST | `/auth/logout` | Clear auth cookies |
+
+### Users — `/user`
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/user/createUser` | Create a user |
 | GET | `/user/getUser/:user_id` | Get a single user |
 | GET | `/user/getAllUsers` | Get all users |
+| PUT | `/user/editUser/:user_id` | Edit user details |
 | DELETE | `/user/deleteUser/:user_id` | Delete a user |
 
-### Restaurant — `/restro`
+### Restaurants — `/restro`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/restro/createRestro` | Create a restro (also creates owner user) |
-| PUT | `/restro/editRestro/:restro_id` | Edit restro details |
-| GET | `/restro/getRestro/:restro_id` | Get a single restro |
-| GET | `/restro/getAllRestros` | Get all restros |
-| DELETE | `/restro/deleteRestro/:restro_id` | Delete a restro |
+| POST | `/restro/createRestro` | Create a restaurant |
+| GET | `/restro/getRestro/:restro_id` | Get a single restaurant |
+| GET | `/restro/getAllRestros` | Get all restaurants |
+| PUT | `/restro/editRestro/:restro_id` | Edit restaurant details |
+| DELETE | `/restro/deleteRestro/:restro_id` | Delete a restaurant |
 
 ### Menu Items — `/restro`
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/restro/createMenuItem` | Create a menu item |
-| PUT | `/restro/editMenuItem/:item_id` | Edit a menu item |
 | GET | `/restro/getMenuItem/:item_id` | Get a single menu item |
-| GET | `/restro/getAllMenuItems/:restro_id` | Get all menu items for a restro |
+| GET | `/restro/getAllMenuItems/:restro_id` | Get all items for a restaurant |
+| PUT | `/restro/editMenuItem/:item_id` | Edit a menu item |
 | DELETE | `/restro/deleteMenuItem/:item_id` | Delete a menu item |
 
 ### Orders — `/order`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/order/createOrder` | Create an order |
-| PUT | `/order/editOrder/:order_id` | Edit an order |
+| POST | `/order/createOrder` | Place an order |
 | GET | `/order/getOrder/:order_id` | Get a single order |
 | GET | `/order/getAllOrders` | Get all orders |
+| PUT | `/order/editOrder/:order_id` | Update order status |
 | DELETE | `/order/deleteOrder/:order_id` | Delete an order |
 
 ### Ordered Items — `/order`
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/order/createOrderedItem` | Add an item to an order |
-| PUT | `/order/editOrderedItem/:order_item_id` | Edit an ordered item |
 | GET | `/order/getOrderedItem/:order_item_id` | Get a single ordered item |
 | GET | `/order/getAllOrderedItems/:order_id` | Get all items for an order |
-| DELETE | `/order/deleteOrderedItem/:order_item_id` | Delete an ordered item |
+| PUT | `/order/editOrderedItem/:order_item_id` | Edit an ordered item |
+| DELETE | `/order/deleteOrderedItem/:order_item_id` | Remove an ordered item |
+
+---
+
+## Frontend Routes
+
+| Path | Portal | Description |
+|---|---|---|
+| `/` | — | Landing page |
+| `/login` | Auth | Login |
+| `/register` | Auth | Register |
+| `/customer/home` | Customer | Browse restaurants |
+| `/customer/restro/:restroId` | Customer | Restaurant menu |
+| `/customer/cart` | Customer | Shopping cart |
+| `/customer/orders` | Customer | Order history |
+| `/customer/orders/:orderId` | Customer | Order detail |
+| `/customer/profile` | Customer | Edit profile |
+| `/merchant/dashboard` | Merchant | Overview and recent orders |
+| `/merchant/menu` | Merchant | Manage menu items |
+| `/merchant/orders` | Merchant | Incoming orders |
+| `/merchant/orders/:orderId` | Merchant | Order detail |
+| `/merchant/restaurant` | Merchant | Restaurant settings |
+| `/merchant/profile` | Merchant | Edit profile |
+| `/admin/dashboard` | Admin | Platform overview |
+| `/admin/users` | Admin | Manage users |
+| `/admin/users/:userId` | Admin | User detail |
+| `/admin/restros` | Admin | Manage restaurants |
+| `/admin/restros/:restroId` | Admin | Restaurant detail |
+| `/admin/orders` | Admin | All orders |
+| `/admin/orders/:orderId` | Admin | Order detail |
+
+---
+
+## Development Notes
+
+- **Auth toggle** — Set `IS_AUTH=false` in `.env` to bypass JWT middleware during development.
+- **Mock data** — The frontend uses `src/data/mock.js` as placeholder data. Replace with real API calls when integrating the backend.
+- **Route tree** — `src/routeTree.gen.js` is auto-generated on every `npm run dev` by the TanStack Router Vite plugin. Do not edit it manually.
+- **pgAdmin** — Accessible at `http://localhost:5050` with the credentials from your `.env`.

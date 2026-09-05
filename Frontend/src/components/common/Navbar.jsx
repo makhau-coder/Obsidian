@@ -1,16 +1,30 @@
-import { Link } from "@tanstack/react-router";
+import { Link, NavLink } from "react-router-dom";
 import Brand from "./Brand.jsx";
 
 export default function Navbar() {
-  const active = { className: "sidebar-link sidebar-link-active" };
   return (
     <header className="sticky top-0 z-10 border-b bg-card/90 backdrop-blur">
       <div className="page-container flex items-center justify-between py-3">
         <Brand />
         <nav className="hidden gap-1 md:flex">
-          <Link to="/customer/home" className="sidebar-link" activeProps={active}>Browse</Link>
-          <Link to="/customer/orders" className="sidebar-link" activeProps={active}>My Orders</Link>
-          <Link to="/customer/cart" className="sidebar-link" activeProps={active}>Cart</Link>
+          <NavLink
+            to="/customer/home"
+            className={({ isActive }) => "sidebar-link" + (isActive ? " sidebar-link-active" : "")}
+          >
+            Browse
+          </NavLink>
+          <NavLink
+            to="/customer/orders"
+            className={({ isActive }) => "sidebar-link" + (isActive ? " sidebar-link-active" : "")}
+          >
+            My Orders
+          </NavLink>
+          <NavLink
+            to="/customer/cart"
+            className={({ isActive }) => "sidebar-link" + (isActive ? " sidebar-link-active" : "")}
+          >
+            Cart
+          </NavLink>
         </nav>
         <div className="flex items-center gap-3">
           <Link

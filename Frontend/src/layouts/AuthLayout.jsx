@@ -1,4 +1,4 @@
-import { Outlet } from "@tanstack/react-router";
+import { Outlet } from "react-router-dom";
 import Brand from "../components/common/Brand.jsx";
 
 export default function AuthLayout() {

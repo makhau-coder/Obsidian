@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader.jsx";
 import Tabs from "../../components/common/Tabs.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
@@ -28,7 +28,7 @@ export default function OrdersPage() {
                 <td><StatusBadge status={o.order_status} /></td>
                 <td>{o.created_at}</td>
                 <td className="text-right">
-                  <Link to="/admin/orders/$orderId" params={{ orderId: o.order_id }} className="btn btn-ghost">
+                  <Link to={`/admin/orders/${o.order_id}`} className="btn btn-ghost">
                     View
                   </Link>
                 </td>

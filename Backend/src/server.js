@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require('express');
+const cors = require('cors');
 const orderRoutes = require('./routes/orderRoutes');
 const restroRoutes = require('./routes/restroRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -19,6 +20,7 @@ const errorHandler = (err, req, res, next) => {
 }
 
 //***************Middlewares***************
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(errorHandler);

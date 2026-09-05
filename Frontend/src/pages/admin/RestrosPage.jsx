@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader.jsx";
 import SearchBar from "../../components/common/SearchBar.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
@@ -30,7 +30,7 @@ export default function RestrosPage() {
                 <td>{r.restro_pincode}</td>
                 <td>{r.created_at}</td>
                 <td className="text-right">
-                  <Link to="/admin/restros/$restroId" params={{ restroId: r.restro_id }} className="btn btn-ghost">
+                  <Link to={`/admin/restros/${r.restro_id}`} className="btn btn-ghost">
                     View
                   </Link>
                 </td>

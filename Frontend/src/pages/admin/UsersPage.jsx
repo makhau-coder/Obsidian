@@ -1,11 +1,25 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader.jsx";
 import SearchBar from "../../components/common/SearchBar.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
-import { users } from "../../data/mock.js";
+import { useEffect, useState } from "react";
+import { getAllUsers } from "../../api/admin.api.js";
 
 export default function UsersPage() {
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    (async () => {
+      const result = await getAllUsers();
+      if (result.success) {
+        setUsers(result.users);
+        console.log("Immediate users array:", result.users);
+      } else {
+        console.error("Backend returned success: false");
+      }
+    })();
+  }, []);
+
   return (
     <div className="page-container py-8">
       <PageHeader title="Users" subtitle="Everyone with an Obsidian account." />
@@ -29,9 +43,9 @@ export default function UsersPage() {
                 <td>{u.user_email}</td>
                 <td><StatusBadge status={u.user_role} /></td>
                 <td>{u.user_phone}</td>
-                <td>{u.created_at}</td>
+                <td>{new Date(u.created_at).toLocaleDateString()}</td>
                 <td className="text-right">
-                  <Link to="/admin/users/$userId" params={{ userId: u.user_id }} className="btn btn-ghost">
+                  <Link to={`/admin/users/${u.user_id}`} className="btn btn-ghost">
                     View
                   </Link>
                 </td>

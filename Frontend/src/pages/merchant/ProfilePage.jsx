@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader.jsx";
 import UserForm from "../../components/forms/UserForm.jsx";
 import { users } from "../../data/mock.js";

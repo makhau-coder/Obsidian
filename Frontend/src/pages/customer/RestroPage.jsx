@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import MenuItemCard from "../../components/cards/MenuItemCard.jsx";
 import BackLink from "../../components/common/BackLink.jsx";
 import { menuItems, money, restros } from "../../data/mock.js";

@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { NavLink } from "react-router-dom";
 import Brand from "./Brand.jsx";
 
 export default function Sidebar({ title, links }) {
@@ -9,19 +9,22 @@ export default function Sidebar({ title, links }) {
       </div>
       <nav className="flex flex-col gap-1">
         {links.map((l) => (
-          <Link
+          <NavLink
             key={l.to}
             to={l.to}
-            className="sidebar-link"
-            activeProps={{ className: "sidebar-link sidebar-link-active" }}
+            className={({ isActive }) =>
+              "sidebar-link" + (isActive ? " sidebar-link-active" : "")
+            }
           >
             <span>{l.icon}</span>
             {l.label}
-          </Link>
+          </NavLink>
         ))}
       </nav>
       <div className="mt-8 border-t pt-4">
-        <Link to="/login" className="sidebar-link"><span>⏻</span> Logout</Link>
+        <NavLink to="/login" className="sidebar-link">
+          <span>⏻</span> Logout
+        </NavLink>
       </div>
     </aside>
   );

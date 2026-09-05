@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import LoginForm from "../../components/auth/LoginForm.jsx";
 
 export default function LoginPage() {

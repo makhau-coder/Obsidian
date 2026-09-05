@@ -17,6 +17,8 @@ build/
 # ─── Vite / Frontend ─────────────────────────────────────────────────────────
 Frontend/.vite/
 Frontend/dist/
+.tanstack/
+Frontend/.tanstack/
 
 # ─── Logs ────────────────────────────────────────────────────────────────────
 logs/

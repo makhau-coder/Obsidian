@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import BackLink from "../../components/common/BackLink.jsx";
 import PageHeader from "../../components/common/PageHeader.jsx";
 import { cartItems, money } from "../../data/mock.js";

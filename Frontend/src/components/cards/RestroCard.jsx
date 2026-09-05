@@ -1,10 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 
 export default function RestroCard({ restro }) {
   return (
     <Link
-      to="/customer/restro/$restroId"
-      params={{ restroId: restro.restro_id }}
+      to={`/customer/restro/${restro.restro_id}`}
       className="card block transition-transform hover:-translate-y-1"
     >
       <div

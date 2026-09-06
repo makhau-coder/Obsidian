@@ -57,10 +57,6 @@ export const cartItems = [
 
 export const statuses = ["PLACED", "PREPARING", "DELIVERED", "CANCELLED"];
 
-export function money(value) {
-  return "\u20B9" + Number(value).toLocaleString("en-IN");
-}
-
 export function restroName(id) {
   const found = restros.find((r) => r.restro_id === id);
   return found ? found.restro_name : "Unknown";

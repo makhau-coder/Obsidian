@@ -26,7 +26,7 @@ const editOrder = async (orderParams, orderData) => {
 
 const getOrder = async (orderParams) => {
     try {
-        const query = `SELECT * from orders WHERE order_id=$1`;
+        const query = `SELECT orders.*, users.user_firstname AS customer_firstname, users.user_lastname AS customer_lastname, restros.restro_name FROM orders JOIN users ON orders.user_id = users.user_id JOIN restros ON orders.restro_id = restros.restro_id WHERE order_id=$1`;
         const result = await db.oneOrNone(query, [orderParams.order_id]);
         return result;
     }
@@ -38,7 +38,7 @@ const getOrder = async (orderParams) => {
 
 const getAllOrders = async () => {
     try {
-        const query = `SELECT * from orders ORDER BY created_at DESC`;
+        const query = `SELECT orders.*, users.user_firstname AS customer_firstname, users.user_lastname AS customer_lastname, restros.restro_name FROM orders JOIN users ON orders.user_id = users.user_id JOIN restros ON orders.restro_id = restros.restro_id ORDER BY orders.created_at DESC`;
         const result = await db.any(query);
         return result;
     }
@@ -60,10 +60,70 @@ const deleteOrder = async (orderParams) => {
     }
 }
 
+const getTotalOrderAmount = async () => {
+    try {
+        const query = `SELECT SUM(total_amount) as total_amount FROM orders`;
+        const result = await db.oneOrNone(query);
+        return result;
+    } catch (error) {
+        console.log('Error calculating total order amount in model:', error);
+        throw error;
+    }
+}
+
+const getTotalOrderAmountByUserId = async (orderParams) => {
+    try {
+        const query = `SELECT SUM(total_amount) as total_amount FROM orders WHERE user_id=$1`;
+        const result = await db.oneOrNone(query, [orderParams.user_id]);
+        return result;
+    } catch (error) {
+        console.log('Error calculating total order amount by user id in model:', error);
+        throw error;
+    }
+}
+
+const getTotalOrderAmountByRestroId = async (orderParams) => {
+    try {
+        const query = `SELECT SUM(total_amount) as total_amount FROM orders WHERE restro_id=$1`;
+        const result = await db.oneOrNone(query, [orderParams.restro_id]);
+        return result;
+    } catch (error) {
+        console.log('Error calculating total order amount by restro id in model:', error);
+        throw error;
+    }
+}
+
+const getOrdersByUserId = async (orderParams) => {
+    try {
+        const query = `SELECT orders.*, users.user_firstname AS customer_firstname, users.user_lastname AS customer_lastname, restros.restro_name FROM orders JOIN users ON orders.user_id = users.user_id JOIN restros ON orders.restro_id = restros.restro_id WHERE orders.user_id=$1 ORDER BY orders.created_at DESC`;
+        const result = await db.any(query, [orderParams.user_id]);
+        return result;
+    } catch (error) {
+        console.log('Error returning all orders by user id in model:', error);
+        throw error;
+    }
+}
+
+const getOrdersByRestroId = async (orderParams) => {
+    try {
+        const query = `SELECT orders.*, users.user_firstname AS customer_firstname, users.user_lastname AS customer_lastname, restros.restro_name FROM orders JOIN users ON orders.user_id = users.user_id JOIN restros ON orders.restro_id = restros.restro_id WHERE orders.restro_id=$1 ORDER BY orders.created_at DESC`;
+        const result = await db.any(query, [orderParams.restro_id]);
+        return result;
+    } catch (error) {
+        console.log('Error returning all orders by restro id in model:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     createOrder,
     editOrder,
     getOrder,
     getAllOrders,
-    deleteOrder
+    deleteOrder,
+    getTotalOrderAmount,
+    getTotalOrderAmountByUserId,
+    getTotalOrderAmountByRestroId,
+    getOrdersByUserId,
+    getOrdersByRestroId
 };

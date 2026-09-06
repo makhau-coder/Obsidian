@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import StatusBadge from "../common/StatusBadge.jsx";
-import { money, restroName } from "../../data/mock.js";
+import { money } from "../../utils.js";
+import { restroName } from "../../data/mock.js";
 
 export default function OrderCard({ order, to, secondary }) {
   return (

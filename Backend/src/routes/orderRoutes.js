@@ -14,6 +14,11 @@ orderRouter.put('/editOrder/:order_id', authMiddleware.authMiddleware, orderCont
 orderRouter.get('/getOrder/:order_id', authMiddleware.authMiddleware, orderController.getOrderController)
 orderRouter.get('/getAllOrders', authMiddleware.authMiddleware, orderController.getAllOrdersController)
 orderRouter.delete('/deleteOrder/:order_id', authMiddleware.authMiddleware, orderController.deleteOrderController)
+orderRouter.get('/getTotalOrderAmount', authMiddleware.authMiddleware, orderController.getTotalOrderAmountController)
+orderRouter.get('/getTotalOrderAmountByUserId/:user_id', authMiddleware.authMiddleware, orderController.getTotalOrderAmountByUserIdController)
+orderRouter.get('/getTotalOrderAmountByRestroId/:restro_id', authMiddleware.authMiddleware, orderController.getTotalOrderAmountByRestroIdController)
+orderRouter.get('/getOrdersByUserId/:user_id', authMiddleware.authMiddleware, orderController.getOrdersByUserIdController)
+orderRouter.get('/getOrdersByRestroId/:restro_id', authMiddleware.authMiddleware, orderController.getOrdersByRestroIdController)
 
 // Ordered Items Routes
 orderRouter.post('/createOrderedItem', authMiddleware.authMiddleware, orderController.createOrderedItemController)

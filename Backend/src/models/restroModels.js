@@ -30,7 +30,7 @@ const editRestro = async (restroParams, restroData) => {
 
 const getRestro = async (restroParams) => {
     try {
-        const query = `SELECT * from restros WHERE restro_id=$1`;
+        const query = `SELECT restros.*, users.user_firstname AS owner_firstname, users.user_lastname AS owner_lastname FROM restros JOIN users ON restros.restro_owner_id = users.user_id WHERE restro_id=$1`;
         const result = await db.oneOrNone(query, [restroParams.restro_id]);
         return result;
     }
@@ -42,7 +42,7 @@ const getRestro = async (restroParams) => {
 
 const getAllRestros = async () => {
     try {
-        const query = `SELECT * from restros ORDER BY created_at DESC`;
+        const query = `SELECT restros.*, users.user_firstname AS owner_firstname, users.user_lastname AS owner_lastname FROM restros JOIN users ON restros.restro_owner_id = users.user_id ORDER BY restros.created_at DESC`;
         const result = await db.any(query);
         return result;
     }

@@ -1,11 +1,34 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import MenuItemCard from "../../components/cards/MenuItemCard.jsx";
 import BackLink from "../../components/common/BackLink.jsx";
-import { menuItems, money, restros } from "../../data/mock.js";
+import Loader from "../../components/common/Loader.jsx";
+import ServerErrorPage from "../ServerErrorPage.jsx";
+import { money } from "../../utils.js";
+import { getRestroById, getMenuItemsByRestro } from "../../api/customer.api.js";
 
 export default function RestroPage() {
-  const restro = restros[0];
-  const items = menuItems.filter((i) => i.restro_id === restro.restro_id);
+  const { restroId } = useParams();
+
+  const { data: restroData, isLoading: restroLoading, isError: restroError } = useQuery({
+    queryKey: ["customerRestro", restroId],
+    queryFn: () => getRestroById(restroId),
+    retry: false
+  });
+
+  const { data: menuData, isLoading: menuLoading, isError: menuError } = useQuery({
+    queryKey: ["customerMenuItems", restroId],
+    queryFn: () => getMenuItemsByRestro(restroId),
+    retry: false
+  });
+
+  if (restroLoading || menuLoading) return <Loader />;
+  if (restroError || menuError) return <ServerErrorPage />;
+
+  const restro = restroData?.restro;
+  const items = menuData?.menuItems || [];
+
+  if (!restro) return <ServerErrorPage message="Restaurant not found" />;
 
   return (
     <div className="page-container py-8 pb-28">
@@ -15,7 +38,7 @@ export default function RestroPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           {restro.restro_location} · {restro.restro_pincode}
         </p>
-        <p className="mt-2 text-sm">★ {restro.rating} · {restro.cuisine} · {restro.eta}</p>
+        <p className="mt-2 text-sm">★ {restro.rating || "New"} · {restro.cuisine || "Multi-cuisine"} · {restro.eta || "30 min"}</p>
       </div>
 
       <h2 className="mb-4 text-xl font-semibold">Menu</h2>
@@ -36,6 +59,7 @@ export default function RestroPage() {
             }
           />
         ))}
+        {items.length === 0 && <p className="text-muted-foreground">No menu items available.</p>}
       </div>
 
       <div className="fixed inset-x-0 bottom-0 border-t bg-card">

@@ -56,6 +56,7 @@ const getOrderService = async (orderParams) => {
 const getAllOrdersService = async () => {
     try {
         const orders = await orderModel.getAllOrders();
+        console.log("orders fetched: ",orders);
         return orders;
     } catch (error) {
         console.log('Error retrieving all orders in service:', error);
@@ -74,6 +75,74 @@ const deleteOrderService = async (orderParams) => {
         return result;
     } catch (error) {
         console.log('Error deleting order in service:', error);
+        throw error;
+    }
+}
+
+const getTotalOrderAmountService = async () => {
+    try {
+        const result = await orderModel.getTotalOrderAmount();
+        return { total_amount: parseFloat(result?.total_amount || 0) };
+    } catch (error) {
+        console.log('Error calculating total order amount in service:', error);
+        throw error;
+    }
+}
+
+const getTotalOrderAmountByUserIdService = async (orderParams) => {
+    try {
+        if (!orderParams.user_id) {
+            console.log('Validation Error: User ID is missing');
+            throw new Error('User ID is missing');
+        }
+        const result = await orderModel.getTotalOrderAmountByUserId(orderParams);
+        return { total_amount: parseFloat(result?.total_amount || 0) };
+    } catch (error) {
+        console.log('Error calculating total order amount by user id in service:', error);
+        throw error;
+    }
+}
+
+const getTotalOrderAmountByRestroIdService = async (orderParams) => {
+    try {
+        if (!orderParams.restro_id) {
+            console.log('Validation Error: Restro ID is missing');
+            throw new Error('Restro ID is missing');
+        }
+        const result = await orderModel.getTotalOrderAmountByRestroId(orderParams);
+        return { total_amount: parseFloat(result?.total_amount || 0) };
+    } catch (error) {
+        console.log('Error calculating total order amount by restro id in service:', error);
+        throw error;
+    }
+}
+
+const getOrdersByUserIdService = async (orderParams) => {
+    try {
+        if (!orderParams.user_id) {
+            console.log('Validation Error: User ID is missing');
+            throw new Error('User ID is missing');
+        }
+
+        const orders = await orderModel.getOrdersByUserId(orderParams);
+        return orders;
+    } catch (error) {
+        console.log('Error retrieving all orders by user id in service:', error);
+        throw error;
+    }
+}
+
+const getOrdersByRestroIdService = async (orderParams) => {
+    try {
+        if (!orderParams.restro_id) {
+            console.log('Validation Error: Restro ID is missing');
+            throw new Error('Restro ID is missing');
+        }
+
+        const orders = await orderModel.getOrdersByRestroId(orderParams);
+        return orders;
+    } catch (error) {
+        console.log('Error retrieving all orders by restro id in service:', error);
         throw error;
     }
 }
@@ -172,5 +241,10 @@ module.exports = {
     editOrderedItemService,
     getOrderedItemService,
     getAllOrderedItemsService,
-    deleteOrderedItemService
+    deleteOrderedItemService,
+    getTotalOrderAmountService,
+    getTotalOrderAmountByUserIdService,
+    getTotalOrderAmountByRestroIdService,
+    getOrdersByUserIdService,
+    getOrdersByRestroIdService
 };

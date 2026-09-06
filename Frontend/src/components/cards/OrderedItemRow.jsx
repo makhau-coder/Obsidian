@@ -1,4 +1,5 @@
-import { money } from "../../data/mock.js";
+import { money } from "../../utils.js";
+
 
 export default function OrderedItemRow({ row }) {
   return (

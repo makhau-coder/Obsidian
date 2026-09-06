@@ -58,6 +58,56 @@ const deleteOrderController = async (req, res) => {
     }
 }
 
+const getTotalOrderAmountController = async (req, res, next) => {
+    try {
+        const result = await orderService.getTotalOrderAmountService();
+        res.status(200).json({ success: true, ...result });
+    } catch (error) {
+        console.error('Error getting total order amount in controller:', error);
+        next(error);
+    }
+}
+
+const getTotalOrderAmountByUserIdController = async (req, res, next) => {
+    try {
+        const result = await orderService.getTotalOrderAmountByUserIdService(req.params);
+        res.status(200).json({ success: true, ...result });
+    } catch (error) {
+        console.error('Error getting total order amount by user id in controller:', error);
+        next(error);
+    }
+}
+
+const getTotalOrderAmountByRestroIdController = async (req, res, next) => {
+    try {
+        const result = await orderService.getTotalOrderAmountByRestroIdService(req.params);
+        res.status(200).json({ success: true, ...result });
+    } catch (error) {
+        console.error('Error getting total order amount by restro id in controller:', error);
+        next(error);
+    }
+}
+
+const getOrdersByUserIdController = async (req, res, next) => {
+    try {
+        const orders = await orderService.getOrdersByUserIdService(req.params);
+        res.status(200).json({ success: true, orders: orders });
+    } catch (error) {
+        console.error('Error retrieving all orders by user id in controller:', error);
+        next(error);
+    }
+}
+
+const getOrdersByRestroIdController = async (req, res, next) => {
+    try {
+        const orders = await orderService.getOrdersByRestroIdService(req.params);
+        res.status(200).json({ success: true, orders: orders });
+    } catch (error) {
+        console.error('Error retrieving all orders by restro id in controller:', error);
+        next(error);
+    }
+}
+
 // ==========================================
 // ORDERED ITEMS CONTROLLERS
 // ==========================================
@@ -130,5 +180,10 @@ module.exports = {
     editOrderedItemController,
     getOrderedItemController,
     getAllOrderedItemsController,
-    deleteOrderedItemController
+    deleteOrderedItemController,
+    getTotalOrderAmountController,
+    getTotalOrderAmountByUserIdController,
+    getTotalOrderAmountByRestroIdController,
+    getOrdersByUserIdController,
+    getOrdersByRestroIdController
 };

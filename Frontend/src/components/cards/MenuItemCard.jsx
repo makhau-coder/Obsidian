@@ -1,5 +1,6 @@
 import StatusBadge from "../common/StatusBadge.jsx";
-import { money } from "../../data/mock.js";
+import { money } from "../../utils.js";
+
 
 export default function MenuItemCard({ item, actions }) {
   return (

@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import OrderCard from "../../components/cards/OrderCard.jsx";
 import PageHeader from "../../components/common/PageHeader.jsx";
 import StatCard from "../../components/common/StatCard.jsx";
-import { menuItems, money, orders } from "../../data/mock.js";
+import { money } from "../../utils.js";
+import { menuItems, orders } from "../../data/mock.js";
 
 export default function DashboardPage() {
   const revenue = orders.reduce((s, o) => s + o.total_amount, 0);

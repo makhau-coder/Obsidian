@@ -5,6 +5,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const restroRoutes = require('./routes/restroRoutes');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 const db = require('./config/db');
 const cookieParser = require('cookie-parser');
 
@@ -19,8 +20,14 @@ const errorHandler = (err, req, res, next) => {
   })
 }
 
+const delaySimulator = async(req,res,next) => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  next();
+}
+
 //***************Middlewares***************
 app.use(cors());
+app.use(delaySimulator);
 app.use(express.json());
 app.use(cookieParser());
 app.use(errorHandler);
@@ -28,6 +35,7 @@ app.use('/order', orderRoutes);
 app.use('/restro', restroRoutes);
 app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
+app.use('/stats', statsRoutes);
 
 
 //***************Server***************

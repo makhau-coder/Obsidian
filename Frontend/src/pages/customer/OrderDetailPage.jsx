@@ -1,7 +1,12 @@
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import OrderedItemRow from "../../components/cards/OrderedItemRow.jsx";
 import BackLink from "../../components/common/BackLink.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
-import { money, orderedItems, orders, restroName } from "../../data/mock.js";
+import Loader from "../../components/common/Loader.jsx";
+import ServerErrorPage from "../ServerErrorPage.jsx";
+import { money } from "../../utils.js";
+import { getOrderById, getAllOrderedItems } from "../../api/customer.api.js";
 
 function Timeline({ status }) {
   const steps = ["PLACED", "PREPARING", "DELIVERED"];
@@ -35,8 +40,27 @@ function Timeline({ status }) {
 }
 
 export default function OrderDetailPage() {
-  const order = orders[0];
-  const items = orderedItems.filter((i) => i.order_id === order.order_id);
+  const { orderId } = useParams();
+
+  const { data: orderData, isLoading: orderLoading, isError: orderError } = useQuery({
+    queryKey: ["customerOrder", orderId],
+    queryFn: () => getOrderById(orderId),
+    retry: false
+  });
+
+  const { data: itemsData, isLoading: itemsLoading, isError: itemsError } = useQuery({
+    queryKey: ["customerOrderedItems", orderId],
+    queryFn: () => getAllOrderedItems(orderId),
+    retry: false
+  });
+
+  if (orderLoading || itemsLoading) return <Loader />;
+  if (orderError || itemsError) return <ServerErrorPage />;
+
+  const order = orderData?.order;
+  const items = itemsData?.orderedItems || [];
+
+  if (!order) return <ServerErrorPage message="Order not found" />;
 
   return (
     <div className="page-container py-8">
@@ -46,7 +70,7 @@ export default function OrderDetailPage() {
           <div>
             <h1 className="page-title">{order.order_id}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              {restroName(order.restro_id)} · {order.created_at}
+              {order.restro_name} · {order.created_at}
             </p>
           </div>
           <div className="flex items-center gap-4">

@@ -3,22 +3,33 @@ import PageHeader from "../../components/common/PageHeader.jsx";
 import SearchBar from "../../components/common/SearchBar.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
-import { useEffect, useState } from "react";
+import Loader from "../../components/common/Loader.jsx";
+import ServerErrorPage from "../ServerErrorPage.jsx";
 import { getAllUsers } from "../../api/admin.api.js";
+import { useQuery } from "@tanstack/react-query";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState([]);
-  useEffect(() => {
-    (async () => {
-      const result = await getAllUsers();
-      if (result.success) {
-        setUsers(result.users);
-        console.log("Immediate users array:", result.users);
-      } else {
-        console.error("Backend returned success: false");
-      }
-    })();
-  }, []);
+
+  const{data, isLoading, isError, error} = useQuery({
+    queryKey: ["users"],
+    queryFn: getAllUsers,
+    retry: false
+  })
+  if(isLoading) {
+    return <Loader/>;
+  }
+  if(isError) {
+    console.log(error);
+    return <ServerErrorPage/>
+  }
+
+  let users;
+  if(data.users) {
+    users=[...data.users];
+  }
+  else {
+    users = [];
+  }
 
   return (
     <div className="page-container py-8">

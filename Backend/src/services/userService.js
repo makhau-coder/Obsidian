@@ -19,8 +19,8 @@ const createUserService = async (userData) => {
             throw new Error('Invalid phone number');
         }
         userData.user_password = await authentication.hashPassword(userData.user_password);
-        const result = await userModel.createUser(user_id, userData);        
-        return result; 
+        const result = await userModel.createUser(user_id, userData);
+        return result;
     } catch (error) {
         console.log('Error creating user in service:', error);
         throw error;
@@ -29,10 +29,10 @@ const createUserService = async (userData) => {
 
 const editUserService = async (userParams, userData) => {
     try {
-        if (userData.firstname) {
+        if (userData.user_firstname) {
             userData.user_firstname = miscellaneousFunctions.capitalizeFirstLetter(userData.user_firstname);
         }
-        if (userData.lastname) {
+        if (userData.user_lastname) {
             userData.user_lastname = miscellaneousFunctions.capitalizeFirstLetter(userData.user_lastname);
         }
         if (userData.user_gender) {
@@ -105,7 +105,7 @@ const deleteUserService = async (userParams) => {
         }
 
         const result = await userModel.deleteUser(userParams);
-        return result; 
+        return result;
     } catch (error) {
         console.log('Error deleting user in service:', error);
         throw error;

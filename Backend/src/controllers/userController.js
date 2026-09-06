@@ -15,7 +15,6 @@ const editUserController = async (req, res, next) => {
     try {
         const user = await userService.editUserService(req.params, req.body);
         res.status(200).json({ success: true, message: `User ${req.params.user_id} edited successfully`, user:user });
-        next();
     }
     catch (error) {
         console.error('Error editing user in controller:', error);

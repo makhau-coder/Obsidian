@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import BackLink from "../../components/common/BackLink.jsx";
 import PageHeader from "../../components/common/PageHeader.jsx";
-import { cartItems, money } from "../../data/mock.js";
+import { money } from "../../utils.js";
+import { cartItems } from "../../data/mock.js";
 
 export default function CartPage() {
   const total = cartItems.reduce((sum, i) => sum + i.item_price * i.quantity, 0);

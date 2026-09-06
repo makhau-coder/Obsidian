@@ -2,7 +2,8 @@ import OrderedItemRow from "../../components/cards/OrderedItemRow.jsx";
 import BackLink from "../../components/common/BackLink.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import OrderForm from "../../components/forms/OrderForm.jsx";
-import { money, orderedItems, orders, userName } from "../../data/mock.js";
+import { money } from "../../utils.js";
+import { orderedItems, orders, userName } from "../../data/mock.js";
 
 export default function OrderDetailPage() {
   const order = orders[0];

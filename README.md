@@ -218,60 +218,98 @@ Frontend runs at **http://localhost:5173**
 
 ## API Reference
 
+> All routes except `/auth/*` require `Authorization: Bearer <accessToken>` when `IS_AUTH=true`.
+
 ### Auth — `/auth`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/auth/register` | Register a new user |
-| POST | `/auth/login` | Login, returns JWT in cookies |
-| POST | `/auth/refresh` | Refresh access token |
-| POST | `/auth/logout` | Clear auth cookies |
+| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/login` | Login — returns access token in body, refresh token in `httpOnly` cookie |
+| `POST` | `/auth/refresh` | Exchange refresh cookie for a new access token |
+| `POST` | `/auth/logout` | Revoke refresh token and clear cookie |
 
 ### Users — `/user`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/user/createUser` | Create a user |
-| GET | `/user/getUser/:user_id` | Get a single user |
-| GET | `/user/getAllUsers` | Get all users |
-| PUT | `/user/editUser/:user_id` | Edit user details |
-| DELETE | `/user/deleteUser/:user_id` | Delete a user |
+| `POST` | `/user/createUser` | Create a user |
+| `GET` | `/user/getUser/:user_id` | Get a single user |
+| `GET` | `/user/getAllUsers` | Get all users |
+| `PUT` | `/user/editUser/:user_id` | Edit user details |
+| `DELETE` | `/user/deleteUser/:user_id` | Delete a user |
 
 ### Restaurants — `/restro`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/restro/createRestro` | Create a restaurant |
-| GET | `/restro/getRestro/:restro_id` | Get a single restaurant |
-| GET | `/restro/getAllRestros` | Get all restaurants |
-| PUT | `/restro/editRestro/:restro_id` | Edit restaurant details |
-| DELETE | `/restro/deleteRestro/:restro_id` | Delete a restaurant |
+| `POST` | `/restro/createRestro` | Create a restaurant |
+| `GET` | `/restro/getRestro/:restro_id` | Get a single restaurant |
+| `GET` | `/restro/getAllRestros` | Get all restaurants |
+| `PUT` | `/restro/editRestro/:restro_id` | Edit restaurant details |
+| `DELETE` | `/restro/deleteRestro/:restro_id` | Delete a restaurant |
 
 ### Menu Items — `/restro`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/restro/createMenuItem` | Create a menu item |
-| GET | `/restro/getMenuItem/:item_id` | Get a single menu item |
-| GET | `/restro/getAllMenuItems/:restro_id` | Get all items for a restaurant |
-| PUT | `/restro/editMenuItem/:item_id` | Edit a menu item |
-| DELETE | `/restro/deleteMenuItem/:item_id` | Delete a menu item |
+| `POST` | `/restro/createMenuItem` | Create a menu item |
+| `GET` | `/restro/getMenuItem/:item_id` | Get a single menu item |
+| `GET` | `/restro/getAllMenuItems/:restro_id` | Get all items for a restaurant |
+| `PUT` | `/restro/editMenuItem/:item_id` | Edit a menu item |
+| `DELETE` | `/restro/deleteMenuItem/:item_id` | Delete a menu item |
 
 ### Orders — `/order`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/order/createOrder` | Place an order |
-| GET | `/order/getOrder/:order_id` | Get a single order |
-| GET | `/order/getAllOrders` | Get all orders |
-| PUT | `/order/editOrder/:order_id` | Update order status |
-| DELETE | `/order/deleteOrder/:order_id` | Delete an order |
+| `POST` | `/order/createOrder` | Place an order |
+| `GET` | `/order/getOrder/:order_id` | Get a single order (with customer & restaurant info) |
+| `GET` | `/order/getAllOrders` | Get all orders |
+| `PUT` | `/order/editOrder/:order_id` | Update order |
+| `DELETE` | `/order/deleteOrder/:order_id` | Delete an order |
+| `GET` | `/order/getOrdersByUserId/:user_id` | Get all orders for a user |
+| `GET` | `/order/getOrdersByRestroId/:restro_id` | Get all orders for a restaurant |
+| `GET` | `/order/getTotalOrderAmount` | Platform-wide revenue total |
+| `GET` | `/order/getTotalOrderAmountByUserId/:user_id` | Revenue total for a user |
+| `GET` | `/order/getTotalOrderAmountByRestroId/:restro_id` | Revenue total for a restaurant |
 
 ### Ordered Items — `/order`
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/order/createOrderedItem` | Add an item to an order |
-| GET | `/order/getOrderedItem/:order_item_id` | Get a single ordered item |
-| GET | `/order/getAllOrderedItems/:order_id` | Get all items for an order |
-| PUT | `/order/editOrderedItem/:order_item_id` | Edit an ordered item |
-| DELETE | `/order/deleteOrderedItem/:order_item_id` | Remove an ordered item |
+| `POST` | `/order/createOrderedItem` | Add an item to an order |
+| `GET` | `/order/getOrderedItem/:order_item_id` | Get a single ordered item |
+| `GET` | `/order/getAllOrderedItems/:order_id` | Get all items for an order |
+| `PUT` | `/order/editOrderedItem/:order_item_id` | Edit an ordered item |
+| `DELETE` | `/order/deleteOrderedItem/:order_item_id` | Remove an ordered item |
+
+### Payment (simulation) — `/payment`
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/payment/initiate` | Create a `PENDING` payment record for an order |
+| `POST` | `/payment/process/:payment_id` | Simulate processing — 90% `SUCCESS` / 10% `FAILED` |
+| `GET` | `/payment/getByOrder/:order_id` | Get the latest payment record for an order |
+| `GET` | `/payment/getById/:payment_id` | Get a single payment by its own ID |
+| `GET` | `/payment/getAllPayments` | Get all payment records |
+
+**`POST /payment/initiate` body:**
+```json
+{ "order_id": "ORDER_<uuid>", "amount": 299.00, "method": "CARD" }
+```
+Allowed `method` values: `CARD` · `UPI` · `WALLET` · `COD`
+
+**`POST /payment/process/:payment_id` response (success):**
+```json
+{ "success": true, "message": "Payment successful. Gateway ref: GW_XXXXXXXX", "payment": { ... } }
+```
+
+**`POST /payment/process/:payment_id` response (failure — HTTP 402):**
+```json
+{ "success": false, "message": "Payment failed. Please try again.", "payment": { ... } }
+```
+
+### Stats — `/stats`
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/stats/counts` | Row counts for users, restaurants, and orders tables |
 
 ---
+
 
 ## Frontend Routes
 

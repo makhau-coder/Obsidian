@@ -1,43 +1,14 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import OrderedItemRow from "../../components/cards/OrderedItemRow.jsx";
 import BackLink from "../../components/common/BackLink.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import Timeline from "../../components/common/Timeline.jsx";
+import PaymentPanel from "../../components/common/PaymentPanel.jsx";
+import OrderedItemRow from "../../components/cards/OrderedItemRow.jsx";
 import Loader from "../../components/common/Loader.jsx";
 import ServerErrorPage from "../ServerErrorPage.jsx";
 import { money } from "../../utils.js";
 import { getOrderById, getAllOrderedItems } from "../../api/customer.api.js";
-
-function Timeline({ status }) {
-  const steps = ["PLACED", "PREPARING", "DELIVERED"];
-  const current = steps.indexOf(status);
-  return (
-    <div className="mt-5 flex items-center">
-      {steps.map((step, i) => (
-        <div key={step} className="flex flex-1 items-center last:flex-none">
-          <div className="flex flex-col items-center gap-1">
-            <span
-              className="flex h-8 w-8 items-center justify-center rounded-full text-xs"
-              style={{
-                background: i <= current ? "var(--primary)" : "var(--muted)",
-                color: i <= current ? "var(--primary-foreground)" : "var(--muted-foreground)",
-              }}
-            >
-              {i + 1}
-            </span>
-            <span className="text-xs text-muted-foreground">{step}</span>
-          </div>
-          {i < steps.length - 1 ? (
-            <div
-              className="mx-2 h-0.5 flex-1"
-              style={{ background: i < current ? "var(--primary)" : "var(--border)" }}
-            />
-          ) : null}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default function OrderDetailPage() {
   const { orderId } = useParams();
@@ -65,6 +36,8 @@ export default function OrderDetailPage() {
   return (
     <div className="page-container py-8">
       <BackLink to="/customer/orders">My orders</BackLink>
+
+      {/* Order header */}
       <div className="card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -81,6 +54,7 @@ export default function OrderDetailPage() {
         <Timeline status={order.order_status} />
       </div>
 
+      {/* Items table */}
       <div className="card mt-5">
         <h2 className="mb-3 text-lg font-semibold">Items</h2>
         <table className="table-basic">
@@ -99,6 +73,9 @@ export default function OrderDetailPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Payment simulation — UI only, no backend connection */}
+      <PaymentPanel amount={order.total_amount} />
     </div>
   );
 }

@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "obsidian-backend-collection",
         "name": "Obsidian Backend API",
-        "description": "Complete collection for User, Order, and Restaurant (Restro & Menu) APIs.",
+        "description": "Complete collection for Auth, User, Order, Restaurant, Payment, and Stats APIs.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -11,9 +11,112 @@
         { "key": "restro_id",     "value": "" },
         { "key": "item_id",       "value": "" },
         { "key": "order_id",      "value": "" },
-        { "key": "order_item_id", "value": "" }
+        { "key": "order_item_id", "value": "" },
+        { "key": "payment_id",    "value": "" },
+        { "key": "access_token",  "value": "" }
     ],
     "item": [
+
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Root - Auth Service",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/auth/", "host": ["{{BASE_URL}}"], "path": ["auth", ""] }
+                    }
+                },
+                {
+                    "name": "Register",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.accessToken) {",
+                                    "        pm.collectionVariables.set('access_token', json.accessToken);",
+                                    "        console.log('Captured access_token from register');",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"user_firstname\": \"Abhay\",\n  \"user_lastname\": \"Chaudhary\",\n  \"user_gender\": \"MALE\",\n  \"user_role\": \"CUSTOMER\",\n  \"user_email\": \"test@gmail.com\",\n  \"user_phone\": \"9999999999\",\n  \"user_password\": \"asdfjkl;\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.accessToken) {",
+                                    "        pm.collectionVariables.set('access_token', json.accessToken);",
+                                    "        console.log('Captured access_token from login');",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"user_email\": \"test@gmail.com\",\n  \"user_password\": \"asdfjkl;\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+                    }
+                },
+                {
+                    "name": "Refresh Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.accessToken) {",
+                                    "        pm.collectionVariables.set('access_token', json.accessToken);",
+                                    "        console.log('Access token refreshed');",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "url": { "raw": "{{BASE_URL}}/auth/refresh", "host": ["{{BASE_URL}}"], "path": ["auth", "refresh"] }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "url": { "raw": "{{BASE_URL}}/auth/logout", "host": ["{{BASE_URL}}"], "path": ["auth", "logout"] }
+                    }
+                }
+            ]
+        },
 
         {
             "name": "Users",
@@ -262,9 +365,9 @@
                                 "exec": [
                                     "if (pm.response.code === 201) {",
                                     "    const json = pm.response.json();",
-                                    "    if (json.order_id) {",
-                                    "        pm.collectionVariables.set('order_id', json.order_id);",
-                                    "        console.log('Captured order_id:', json.order_id);",
+                                    "    if (json.order && json.order.order_id) {",
+                                    "        pm.collectionVariables.set('order_id', json.order.order_id);",
+                                    "        console.log('Captured order_id:', json.order.order_id);",
                                     "    }",
                                     "}"
                                 ]
@@ -294,6 +397,41 @@
                     "request": {
                         "method": "GET",
                         "url": { "raw": "{{BASE_URL}}/order/getOrder/{{order_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "getOrder", "{{order_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get Orders by User",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getOrdersByUserId/{{user_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "getOrdersByUserId", "{{user_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get Orders by Restro",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getOrdersByRestroId/{{restro_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "getOrdersByRestroId", "{{restro_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get Total Order Amount",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getTotalOrderAmount", "host": ["{{BASE_URL}}"], "path": ["order", "getTotalOrderAmount"] }
+                    }
+                },
+                {
+                    "name": "Get Total Order Amount by User",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getTotalOrderAmountByUserId/{{user_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "getTotalOrderAmountByUserId", "{{user_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get Total Order Amount by Restro",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/order/getTotalOrderAmountByRestroId/{{restro_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "getTotalOrderAmountByRestroId", "{{restro_id}}"] }
                     }
                 },
                 {
@@ -395,6 +533,106 @@
                     "request": {
                         "method": "DELETE",
                         "url": { "raw": "{{BASE_URL}}/order/deleteOrderedItem/{{order_item_id}}", "host": ["{{BASE_URL}}"], "path": ["order", "deleteOrderedItem", "{{order_item_id}}"] }
+                    }
+                }
+            ]
+        },
+
+        {
+            "name": "Payment",
+            "item": [
+                {
+                    "name": "Root - Payment Service",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/payment/", "host": ["{{BASE_URL}}"], "path": ["payment", ""] }
+                    }
+                },
+                {
+                    "name": "Initiate Payment",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.payment && json.payment.payment_id) {",
+                                    "        pm.collectionVariables.set('payment_id', json.payment.payment_id);",
+                                    "        console.log('Captured payment_id:', json.payment.payment_id);",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"order_id\": \"{{order_id}}\",\n  \"amount\": 1450.50,\n  \"method\": \"UPI\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": { "raw": "{{BASE_URL}}/payment/initiate", "host": ["{{BASE_URL}}"], "path": ["payment", "initiate"] }
+                    }
+                },
+                {
+                    "name": "Process Payment",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "if (json.payment) {",
+                                    "    console.log('Payment status:', json.payment.status);",
+                                    "    console.log('Gateway ref:', json.payment.gateway_ref);",
+                                    "    pm.test('Payment processed', () => {",
+                                    "        pm.expect(['SUCCESS', 'FAILED']).to.include(json.payment.status);",
+                                    "    });",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "url": { "raw": "{{BASE_URL}}/payment/process/{{payment_id}}", "host": ["{{BASE_URL}}"], "path": ["payment", "process", "{{payment_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get Payment by Order",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/payment/getByOrder/{{order_id}}", "host": ["{{BASE_URL}}"], "path": ["payment", "getByOrder", "{{order_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get Payment by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/payment/getById/{{payment_id}}", "host": ["{{BASE_URL}}"], "path": ["payment", "getById", "{{payment_id}}"] }
+                    }
+                },
+                {
+                    "name": "Get All Payments",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/payment/getAllPayments", "host": ["{{BASE_URL}}"], "path": ["payment", "getAllPayments"] }
+                    }
+                }
+            ]
+        },
+
+        {
+            "name": "Stats",
+            "item": [
+                {
+                    "name": "Get Table Counts",
+                    "request": {
+                        "method": "GET",
+                        "url": { "raw": "{{BASE_URL}}/stats/counts", "host": ["{{BASE_URL}}"], "path": ["stats", "counts"] }
                     }
                 }
             ]

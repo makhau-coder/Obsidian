@@ -6,6 +6,7 @@ const restroRoutes = require('./routes/restroRoutes');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 const db = require('./config/db');
 const cookieParser = require('cookie-parser');
 
@@ -36,6 +37,7 @@ app.use('/restro', restroRoutes);
 app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/stats', statsRoutes);
+app.use('/payment', paymentRoutes);
 
 
 //***************Server***************

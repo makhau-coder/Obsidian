@@ -8,6 +8,11 @@ const statusStyles = {
   CUSTOMER: { background: "oklch(0.93 0.05 245)", color: "oklch(0.45 0.14 250)" },
   MERCHANT: { background: "oklch(0.94 0.08 85)", color: "oklch(0.45 0.12 70)" },
   ADMIN: { background: "oklch(0.93 0.05 25)", color: "oklch(0.48 0.16 27)" },
+  // Payment statuses
+  SUCCESS: { background: "oklch(0.93 0.06 155)", color: "oklch(0.38 0.13 155)" },
+  PAID: { background: "oklch(0.93 0.06 155)", color: "oklch(0.38 0.13 155)" },
+  PENDING: { background: "oklch(0.94 0.08 85)", color: "oklch(0.45 0.12 70)" },
+  FAILED: { background: "oklch(0.93 0.05 25)", color: "oklch(0.48 0.16 27)" },
 };
 
 export default function StatusBadge({ status }) {

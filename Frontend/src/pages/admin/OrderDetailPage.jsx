@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import BackLink from "../../components/common/BackLink.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import PaymentStatusPanel from "../../components/common/PaymentStatusPanel.jsx";
 import OrderedItemRow from "../../components/cards/OrderedItemRow.jsx";
 import OrderForm from "../../components/forms/OrderForm.jsx";
 import ConfirmDialog from "../../components/common/ConfirmDialog.jsx";
@@ -9,7 +10,6 @@ import Loader from "../../components/common/Loader.jsx";
 import ServerErrorPage from "../ServerErrorPage.jsx";
 import { getOrderById, getAllOrderedItems, editOrder, deleteOrder } from "../../api/admin.api.js";
 import { money } from "../../utils.js";
-
 
 export default function OrderDetailPage() {
   const { orderId } = useParams();
@@ -34,7 +34,7 @@ export default function OrderDetailPage() {
       queryClient.invalidateQueries(["order", orderId]);
       queryClient.invalidateQueries(["orders"]);
     },
-    retry:false
+    retry: false
   });
 
   const deleteMutation = useMutation({
@@ -43,7 +43,7 @@ export default function OrderDetailPage() {
       queryClient.invalidateQueries(["orders"]);
       navigate("/admin/orders");
     },
-    retry:false
+    retry: false
   });
 
   if (orderLoading || itemsLoading) return <Loader />;
@@ -54,17 +54,11 @@ export default function OrderDetailPage() {
 
   if (!order) return <ServerErrorPage message="Order not found" />;
 
-  const handleStatusUpdate = (newStatus) => {
-    updateMutation.mutate(newStatus);
-  };
-
-  const handleDelete = () => {
-    deleteMutation.mutate();
-  };
-
   return (
     <div className="page-container py-8">
       <BackLink to="/admin/orders">Orders</BackLink>
+
+      {/* Order header */}
       <div className="card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -80,6 +74,7 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
+      {/* Items table */}
       <div className="card mt-5">
         <h2 className="mb-3 text-lg font-semibold">Ordered items</h2>
         <table className="table-basic">
@@ -94,15 +89,20 @@ export default function OrderDetailPage() {
         </table>
       </div>
 
+      {/* Payment status — UI only, no backend connection */}
+      <PaymentStatusPanel order={order} />
+
+      {/* Status editor */}
       <div className="mt-5">
-        <OrderForm status={order.order_status} onSubmit={handleStatusUpdate} />
+        <OrderForm status={order.order_status} onSubmit={(s) => updateMutation.mutate(s)} />
       </div>
 
+      {/* Danger zone */}
       <div className="mt-8">
-        <ConfirmDialog 
-          title="Delete this order?" 
-          message="The order and its items will be permanently removed." 
-          onConfirm={handleDelete}
+        <ConfirmDialog
+          title="Delete this order?"
+          message="The order and its items will be permanently removed."
+          onConfirm={() => deleteMutation.mutate()}
         />
       </div>
     </div>

@@ -92,6 +92,14 @@ erDiagram
         TIMESTAMP     created_at       "DEFAULT NOW()"
     }
 
+    refresh_tokens {
+        VARCHAR(255)  jti              PK
+        VARCHAR(255)  user_id          FK
+        TIMESTAMP     expires_at
+        TIMESTAMP     created_at       "DEFAULT NOW()"
+        TIMESTAMP     revoked_at       "NULL = active"
+    }
+
     restros {
         VARCHAR(255)  restro_id        PK
         VARCHAR(100)  restro_owner_id  FK
@@ -129,11 +137,24 @@ erDiagram
         TIMESTAMP     created_at       "DEFAULT NOW()"
     }
 
+    payments {
+        VARCHAR(100)  payment_id       PK
+        VARCHAR(100)  order_id         FK
+        DECIMAL       amount           "NOT NULL"
+        VARCHAR(30)   method           "CARD | UPI | WALLET | COD"
+        VARCHAR(20)   status           "PENDING | SUCCESS | FAILED"
+        VARCHAR(100)  gateway_ref      "NULL until processed"
+        TIMESTAMP     created_at       "DEFAULT NOW()"
+        TIMESTAMP     processed_at     "NULL until processed"
+    }
+
+    users         ||--o{ refresh_tokens : "has sessions"
     users         ||--o{ restros        : "owns"
     users         ||--o{ orders         : "places"
     restros       ||--o{ menu_items     : "has"
     restros       ||--o{ orders         : "receives"
     orders        ||--o{ ordered_items  : "contains"
+    orders        ||--o{ payments       : "paid via"
     menu_items    ||--o{ ordered_items  : "referenced by"
 ```
 
@@ -184,7 +205,7 @@ docker compose up
 | Service | URL |
 |---|---|
 | Express API | http://localhost:5000 |
-| PostgreSQL | localhost:5432 |
+| PostgreSQL | http://localhost:5432 |
 | pgAdmin | http://localhost:5050 |
 
 ---
@@ -196,10 +217,12 @@ Run in order — child tables depend on parent tables:
 ```bash
 cd Backend
 node src/Migrations/userTable.js
+node src/Migrations/refreshTokenTable.js
 node src/Migrations/restroTable.js
 node src/Migrations/menuItemsTable.js
 node src/Migrations/orderTable.js
 node src/Migrations/orderedItemsTable.js
+node src/Migrations/paymentTable.js
 ```
 
 ---

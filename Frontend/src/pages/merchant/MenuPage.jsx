@@ -1,11 +1,36 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import MenuItemCard from "../../components/cards/MenuItemCard.jsx";
 import PageHeader from "../../components/common/PageHeader.jsx";
 import Modal from "../../components/common/Modal.jsx";
 import MenuItemForm from "../../components/forms/MenuItemForm.jsx";
-import { menuItems } from "../../data/mock.js";
+import Loader from "../../components/common/Loader.jsx";
+import ServerErrorPage from "../ServerErrorPage.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { getMenuItemsByRestro, deleteMenuItem } from "../../api/restro.api.js";
 
 export default function MenuPage() {
-  const items = menuItems.filter((i) => i.restro_id === "res_01");
+  const { currentUser } = useAuth();
+  const restroId = currentUser?.restro_id;
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["merchantMenu", restroId],
+    queryFn: () => getMenuItemsByRestro(restroId),
+    enabled: !!restroId,
+    retry: false
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (itemId) => deleteMenuItem(itemId),
+    onSuccess: () => queryClient.invalidateQueries(["merchantMenu", restroId]),
+    retry: false
+  });
+
+  if (isLoading) return <Loader />;
+  if (isError) return <ServerErrorPage />;
+
+  const items = data?.menuItems || [];
+
   return (
     <div className="page-container py-8">
       <PageHeader
@@ -21,7 +46,13 @@ export default function MenuPage() {
             actions={
               <>
                 <button className="btn btn-ghost">Edit</button>
-                <button className="btn btn-danger">Delete</button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => deleteMutation.mutate(item.item_id)}
+                  disabled={deleteMutation.isPending}
+                >
+                  Delete
+                </button>
               </>
             }
           />

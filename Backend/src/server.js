@@ -31,13 +31,13 @@ app.use(cors());
 app.use(delaySimulator);
 app.use(express.json());
 app.use(cookieParser());
-app.use(errorHandler);
 app.use('/order', orderRoutes);
 app.use('/restro', restroRoutes);
 app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/stats', statsRoutes);
 app.use('/payment', paymentRoutes);
+app.use(errorHandler);
 
 
 //***************Server***************

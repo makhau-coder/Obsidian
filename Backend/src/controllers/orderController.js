@@ -136,11 +136,11 @@ const editOrderedItemController = async (req, res) => {
 
 const getOrderedItemController = async (req, res) => {
     try {
-        const ordered_item = await orderService.getOrderedItemService(req.params);
+        const orderedItem = await orderService.getOrderedItemService(req.params);
         if (!orderedItem) {
             return res.status(404).json({ success: false, message: 'Ordered item not found' });
         }
-        res.status(200).json({ success: true, orderedItem: result.orderedItem });
+        res.status(200).json({ success: true, orderedItem: orderedItem });
     }
     catch (error) {
         console.error(`Error retrieving ordered item ${req.params.order_item_id} in controller:`, error);

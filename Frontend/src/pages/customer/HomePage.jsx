@@ -5,9 +5,10 @@ import SearchBar from "../../components/common/SearchBar.jsx";
 import Loader from "../../components/common/Loader.jsx";
 import ServerErrorPage from "../ServerErrorPage.jsx";
 import { getAllRestros } from "../../api/customer.api.js";
-import { currentUser } from "../../data/mock.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function HomePage() {
+  const { currentUser } = useAuth();
   const { data: restrosData, isLoading, isError } = useQuery({
     queryKey: ["customerRestros"],
     queryFn: getAllRestros,
@@ -21,7 +22,7 @@ export default function HomePage() {
 
   return (
     <div className="page-container py-8">
-      <PageHeader title={`Hungry, ${currentUser.user_firstname}?`} subtitle="Kitchens delivering to you right now." />
+      <PageHeader title={`Hungry, ${currentUser?.user_firstname || "there"}?`} subtitle="Kitchens delivering to you right now." />
       <SearchBar
         placeholder="Search restaurants or dishes"
         filters={[{ label: "pincode", options: ["All pincodes", "400050", "560038", "122002"] }]}

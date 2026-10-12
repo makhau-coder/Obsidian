@@ -7,7 +7,7 @@ import ServerErrorPage from "../ServerErrorPage.jsx";
 import Loader from "../../components/common/Loader.jsx";
 import { getAllOrders } from "../../api/admin.api.js";
 import { useQuery } from "@tanstack/react-query";
-import { statuses} from "../../data/mock.js";
+import { ORDER_STATUSES } from "../../components/forms/OrderForm.jsx";
 
 export default function OrdersPage() {
   const { data, isLoading, isError, error } = useQuery({
@@ -38,7 +38,7 @@ export default function OrdersPage() {
   return (
     <div className="page-container py-8">
       <PageHeader title="Orders" subtitle="Every order across the platform." />
-      <Tabs items={["All"].concat(statuses)} active="All" />
+      <Tabs items={["All"].concat(ORDER_STATUSES)} active="All" />
       <div className="card">
         <table className="table-basic">
           <thead>

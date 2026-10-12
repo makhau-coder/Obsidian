@@ -4,7 +4,6 @@ import SearchBar from "../../components/common/SearchBar.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
 import Loader from "../../components/common/Loader.jsx";
 import ServerErrorPage from "../ServerErrorPage.jsx";
-import { userName } from "../../data/mock.js";
 import { getAllRestros } from "../../api/admin.api.js";
 import { useQuery } from "@tanstack/react-query";
 
